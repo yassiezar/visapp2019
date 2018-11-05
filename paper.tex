@@ -21,15 +21,15 @@
 \subfigbottomskip=0pt
 
 \usepackage{siunitx}
-\usepackage{tikz}
+%\usepackage{tikz}
 
-\usetikzlibrary{calc,arrows.meta,intersections,backgrounds,shapes.misc}
+%\usetikzlibrary{calc,arrows.meta,intersections,backgrounds,shapes.misc}
 
 \usepackage{SCITEPRESS}     % Please add other packages that you may need BEFORE the SCITEPRESS.sty package.
 
 \begin{document}
 
-\title{Designing an Indoor Guidance System for the Visually Impaired} 
+\title{Designing an Active Vision Indoor Object Search Guidance System} 
 
 \author{
   \authorname{John Anon{\sup{1}}}
@@ -39,28 +39,28 @@
 %\email{jlock@lincoln.ac.uk}
 }
 
-\keywords{Active vision, vision impaired, Markov decision process, object search}
+\keywords{Active vision, object search, vision impaired, Markov decision process}
 
-\abstract{In this work, we propose an active vision system that uses a Markov Decision Process and mobile phone to enable a user to find an object in an unknown environment. This project aims to deliver a workable system to the visually impaired, but a set of experiments were carried out with sighted participants to determine the effectiveness of the system. We found that the system works reasonably well and compares well to similar systems. However, some improvements are required before it is ready for real-world use. }
+\abstract{In this work, we propose an active vision system that uses a Markov Decision Process and mobile phone to enable a user to find an object in an unknown environment. An initial implementation of this system was implemented and tested with a set of experiments were carried out with sighted participants to determine the effectiveness of the system. We found that the system works reasonably well and compares well to similar systems. }
 
 \onecolumn \maketitle \normalsize \vfill
 
 \section{\uppercase{Introduction}}
 
-\noindent We are designing an indoor navigation system targeted towards enabling blind and visually impaired (VI) users to safely navigate towards their desired destination or find an object in an unknown and dynamic environment, expanding upon ideas originally proposed in~\cite{bellotto2013} and expanded on in~\cite{lock2017portable}. The proposed system implements ideas from the active vision field and places a human in the control loop. This control loop, pictured in Figure~\ref{fig:control-loop}, comprises of a controller, $K$, that is given a reference signal (the desired objects in this case) that generates a control signal, $u$, which a human, $H$, uses to manipulate a sensor, $P$, to gather more information on the environment and move closer to the target object. %The goal of this system is to automatically make sense of the user's surroundings and determine the optimal route to get to the final destination based on what the user/camera sees, thereby roughly emulating a normally sighted user's navigation strategy in an unknown environment.
+\noindent We are designing an indoor navigation system (ActiVis) targeted towards enabling blind and visually impaired (VI) users to safely navigate towards their desired destination or find an object in an unknown and dynamic environment, expanding upon ideas originally proposed in~\cite{bellotto2013} and expanded on in~\cite{lock2017portable}. The proposed system implements ideas from the active vision field and places a human in the control loop. This control loop, pictured in Figure~\ref{fig:control-loop}, comprises of a controller, $K$, that is given a reference signal (the desired objects in this case) that generates a control signal, $u$, which a human, $H$, uses to manipulate a sensor, $P$, to gather more information on the environment and move closer to the target object. %The goal of this system is to automatically make sense of the user's surroundings and determine the optimal route to get to the final destination based on what the user/camera sees, thereby roughly emulating a normally sighted user's navigation strategy in an unknown environment.
 
-In this paper we discuss the first steps we have taken into implementing the control-block, $K$, from Figure~\ref{fig:control-loop}. The goal of this system is to understand the user's surroundings and determine what the next best course of action is to reach the target location, based on what the system is currently seeing and what it has seen in the past. We used a Markov Decision Process (MDP)~\cite{bellman1957markovian} to produce a so-called policy that defines the optimal action, $a$, our agent (the guidance system in this case) takes when it is in some state $s$.  
+In this paper we discuss the first steps we have taken into implementing the control-block, $K$, from Figure~\ref{fig:control-loop}. The goal of ActiVis is to understand the user's surroundings and determine what the next best course of action is to reach the target location, based on what the it is currently seeing and what it has seen in the past. We used a Markov Decision Process (MDP)~\cite{bellman1957markovian} to produce a so-called policy that defines the optimal action, $a$, our agent (the guidance system in this case) takes when it is in some state $s$.  
 
 \begin{figure}
   \centering
   \includegraphics[width=0.4\textwidth]{figures/control_loop.png}
-  \caption{MEME}\label{fig:control-loop}
+  \caption{The ActVis system layout and control loop. }\label{fig:control-loop}
 \end{figure}
 
 
 This work's main contribution is the design of a guidance system and MDP that can drive a user to point a mobile device's camera towards a given point in space in and find a target object. We also present and discuss preliminary experimental results to show how effective the system is at finding a target.
 
-Section~\ref{sec:previous-work} discusses other relevant work done in this field, followed by a detailed discussion on the design of the guidance system, human-control module and MDP\@ in Sections~\ref{sec:system-design} and~\ref{sec:controller-design}. Then we discuss the experiment and present its results in Section~\ref{sec:experiments}, after which we conclude the paper and discuss the project's next steps in Section~\ref{sec:conclusion}. 
+Section~\ref{sec:previous-work} discusses other relevant work done in this field, followed by a detailed discussion on the design of the ActiVisguidance  system, human-control module and MDP\@ in Sections~\ref{sec:system-design} and~\ref{sec:controller-design}. Then we discuss the experiment and present its results in Section~\ref{sec:experiments}, after which we conclude the paper and discuss the project's next steps in Section~\ref{sec:conclusion}. 
 
 \section{\uppercase{Previous Work}}\label{sec:previous-work}
 
@@ -115,7 +115,7 @@ The reward function is a very important parameter for training the agent to prod
 
 \begin{table}
   \centering
-  \caption{MEME}\label{tab:rewards}
+  \caption{A table containing the model rewards for our MDP. }\label{tab:rewards}
   \begin{tabular}{ll}
     \toprule
     $s\in\mathbf{S}$ & -1.0  \\ \midrule
@@ -179,7 +179,7 @@ The spatial relationships between the objects in $\mathbf{O}$ are extracted from
     \centering
     \includegraphics[width=0.4\textwidth]{figures/mug_example.png}
   \end{subfigure}
-  \caption{MEME~\cite{openimages}}\label{fig:openimage-example}
+  \caption{Examples of images from the OpenImage dataset containing objects from $\mathit{O}$~\cite{openimages}}\label{fig:openimage-example}
 \end{figure}
 
 \subsubsection{Model Training}
