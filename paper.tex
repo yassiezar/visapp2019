@@ -47,14 +47,16 @@
 
 \section{\uppercase{Introduction}}
 
-\noindent We are designing an indoor navigation system targeted towards enabling blind and visually impaired (VI) users to safely navigate towards their desired destination or find an object in an unknown and dynamic environment, expanding upon ideas originally proposed in~\cite{bellotto2013}. The proposed system implements ideas from the active vision field and places a human in the control loop. This control loop, pictured in Figure~\ref{fig:control-loop}, comprises of a controller, $K$, that is given a reference signal (the desired objects in this case) that generates a control signal, $u$, which a human, $H$, uses to manipulate a sensor, $P$, to gather more information on the environment and move closer to the target object. %The goal of this system is to automatically make sense of the user's surroundings and determine the optimal route to get to the final destination based on what the user/camera sees, thereby roughly emulating a normally sighted user's navigation strategy in an unknown environment.
+\noindent We are designing an indoor navigation system targeted towards enabling blind and visually impaired (VI) users to safely navigate towards their desired destination or find an object in an unknown and dynamic environment, expanding upon ideas originally proposed in~\cite{bellotto2013} and expanded on in~\cite{lock2017portable}. The proposed system implements ideas from the active vision field and places a human in the control loop. This control loop, pictured in Figure~\ref{fig:control-loop}, comprises of a controller, $K$, that is given a reference signal (the desired objects in this case) that generates a control signal, $u$, which a human, $H$, uses to manipulate a sensor, $P$, to gather more information on the environment and move closer to the target object. %The goal of this system is to automatically make sense of the user's surroundings and determine the optimal route to get to the final destination based on what the user/camera sees, thereby roughly emulating a normally sighted user's navigation strategy in an unknown environment.
+
+In this paper we discuss the first steps we have taken into implementing the control-block, $K$, from Figure~\ref{fig:control-loop}. The goal of this system is to understand the user's surroundings and determine what the next best course of action is to reach the target location, based on what the system is currently seeing and what it has seen in the past. We used a Markov Decision Process (MDP)~\cite{bellman1957markovian} to produce a so-called policy that defines the optimal action, $a$, our agent (the guidance system in this case) takes when it is in some state $s$.  
 
 \begin{figure}
+  \centering
   \includegraphics[width=0.4\textwidth]{figures/control_loop.png}
-  \caption{The control }\label{fig:control-loop}
+  \caption{MEME}\label{fig:control-loop}
 \end{figure}
 
-In this paper we discuss the first steps we've taken into implementing the control-block, $K$, from Figure~\ref{fig:control-loop}. The goal of this system is to understand the user's surroundings and determine what the next best course of action is to reach the target location, based on what the system is currently seeing and what it has seen in the past. We used a Markov Decision Process (MDP)~\cite{bellman1957markovian} to produce a so-called policy that defines the optimal action, $a$, our agent (the guidance system in this case) takes when it is in some state $s$.  
 
 This work's main contribution is the design of a guidance system and MDP that can drive a user to point a mobile device's camera towards a given point in space in and find a target object. We also present and discuss preliminary experimental results to show how effective the system is at finding a target.
 
@@ -66,103 +68,129 @@ Section~\ref{sec:previous-work} discusses other relevant work done in this field
 
 Another approach is to discard tags completely and rely on computer vision to perform the object detection, something that has become more plausible with recent improvements to feature detectors and deep networks~\cite{huang2017speed,redmon2016you}. The system described~\cite{schauerte2012assistive} uses a combination of SIFT and SURF to detect known objects when they are in the camera's view and guide the user to them using sonified guidance instructions. This system is more flexible than the tag-based ones, but have the same drawback of being passive and rely on chance for the user to place the object within the camera's view in the first place. The paper also does not report on any performance metrics. In~\cite{bigham2010vizwiz}, the authors discuss their VizWiz system that offloads the object recognition tasks to an Amazon Mechanical Turk worker that then provides feedback on where the object of interest is located relative to the user. The VizWiz has the advantage of being fairly robust and is able to classify a great deal of objects with little effort from the user and can provide natural, human-generated and curated directions. However, this approach does not address the issue of enhancing user independence, since the user is now beholden to an online worker instead of a relative, friend or bystander. Furthermore, a good internet connection is required on the device, perhaps limiting use in some poor-reception areas.
 
-As shown here, much research has been performed on object recognition and guidance towards an object once detected. However, work on active object search is harder to come by. Therefore, in this work we attempt to implement an active vision~\cite{aloimonos1988active, bellotto2013, lock2017portable} that can guide a user towards an out-of-view target object by using prior knowledge of the spatial distribution of objects within an indoor environment and the history of past object observations made during the search. With this, we hope to make the searching process less random and move towards a more natural search object searching process to the benefit of the VI.  
+As shown here, much research has been performed on object recognition and guidance towards an object once detected. However, work on active object search is harder to come by. Therefore, in this work we attempt to implement an active vision~\cite{aloimonos1988active,bellotto2013,lock2017portable} that can guide a user towards an out-of-view target object by using prior knowledge of the spatial distribution of objects within an indoor environment and the history of past object observations made during the search. With this, we hope to make the searching process less random and move towards a more natural search object searching process to the benefit of the VI\@.  
 
 \section{\uppercase{Active Vision System Design}}\label{sec:system-design}
 
+\noindent The ActiVis project's goal is to deliver a stand-alone system that is capable of accepting user input on a target object\textbackslash{}destination and guide a VI user to it. A complete system diagram is given is Figure~\ref{fig:control-loop} and consists of a number of elements, or blocks
+
+From Figure~\ref{fig:control-loop}, it can be seen that the system layout is similar to that of a classical control problem where a controller generates a control signal that drives a component towards some reference point. In this case, the reference signal, $r$, is the object the user wishes to find, which the system can achieve by placing that object within the camera's view. Therefore, the goal of the control block, $K$, is to generate guidance instructions, $u$, in the form of visual or audio instructions, to drive the along a search path. Since we are not working with a electro-mechanical system, we have an extra suer block, $H$, that interprets $u$ and executes a physical action, $u^*$, that manipulates the sensor, $P$, to point in another direction and make a new observation. The cycle is repeated if the target object is not observed.  
+
+This work focusses on implementing $K$ and there are 2 points of interest to implementing such a controller successfully. Firstly, $K$ must be environment-agnostic, meaning that it cannot be constrained to specific environment since objects are not necessarily placed in the same place in every environment. Secondly, the controller must be robust enough to handle a badly interpreted $u$ signal. The risk of that happening can be minimised by generating clear and simple signals, ensuring $u^*$ closely tracks the original signal, $u$. 
+
 \section{\uppercase{Human-control Module}}\label{sec:controller-design}
 
-\noindent The guidance system is built into an Android app with Android's ARCore~\footnote{https://developers.google.com/ar/} API enabled and is designed with the goal of generating a path of waypoints for the user to follow with a camera that will lead to the target object. This path is generated one waypoint at a time by the system and is updated with every object observation the user makes when adjusting the camera. We modelled this optimal path search problem as a grid-world problem that is solved by an Markov Decision Process (MDP) model. The details of the grid layout and the MDP model are discussed in the sections below. For this initial design, the system only works in the pan and tilt dimension and the depth dimension will be added after successful testing of this version of the guidance system.
+\noindent The guidance system is built into an Android app with Android's ARCore~\footnote{https://developers.google.com/ar/} API enabled and is designed with the goal of generating a path of waypoints for the user to follow with a camera that will lead to the target object. This path is generated one waypoint at a time by the system and is updated with every object observation the user makes when adjusting the camera. We modelled this optimal path search problem as a grid-world problem that is solved by an Markov Decision Process (MDP) model. The details of the grid layout and the MDP model are discussed in the sections below. %For this initial design, the system only works in the pan and tilt dimension and the depth dimension will be added after successful testing of this version of the guidance system.
 
-\subsection{Environment Design}\label{sec:env-design}
+%\subsection{Environment Model}\label{sec:env-design}
 
-\noindent We model this problem on the familiar grid-world problem, where an agent is tasked move to a terminal square from an origin square given some constraints. However, instead of the traditional, linear grid-world problem, we use the grid in a radial coordinate system which surrounds the user and each grid square represent a pan/tilt angle coordinate. See Fig.~\ref{fig:environment} for an example grid. Since we do not consider the depth dimension yet, each grid square is equidistant from the user and agent. The agent translates between the squares as the user points the camera in different directions.
+%\noindent We model this problem on the familiar grid-world problem, where an agent is tasked move to a terminal square from an origin square given some constraints. However, instead of the traditional, linear grid-world problem, we use the grid in a radial coordinate system which surrounds the user and each grid square represent a pan/tilt angle coordinate. See Fig.~\ref{fig:environment} for an example grid. Since we do not consider the depth dimension yet, each grid square is equidistant from the user and agent. The agent translates between the squares as the user points the camera in different directions.
 
-\begin{figure}  
-  \centering
-  \input{figures/fig.tex}
-\caption{A diagram of the radial grid-world used in the MDP is modelled with. }\label{fig:environment}
-\end{figure}
+%\begin{figure}  
+  %\centering
+  %\input{figures/fig.tex}
+%\caption{A diagram of the radial grid-world used in the MDP is modelled with. }\label{fig:environment}
+%\end{figure}
 
-MDPs are well-suited to solving this class of problem, i.e.\ to find the optimal route from the origin square to the terminal square, so modelling our problem as a grid-world allows us to design our guidance system and MDP model with existing and well-understood models and techniques. Each square of the grid represents a combination of the agent's pan-tilt-observation, or state, which is discussed in more detail in Sec.~\ref{sec:states}. The terminal square is the square whose state contains the target object, or observation. The grid size can be adjusted to control the model's resolution: smaller squares will increase accuracy, but at the cost of performance, both during use (more squares need to be traversed) and training (much larger state space). For the initial system design, we set the grid resolution to \SI{30}{\degree}.
+%MDPs are well-suited to solving this class of problem, i.e.\ to find the optimal route from the origin square to the terminal square, so modelling our problem as a grid-world allows us to design our guidance system and MDP model with existing and well-understood models and techniques. Each square of the grid represents a combination of the agent's pan-tilt-observation, or state, which is discussed in more detail in Sec.~\ref{sec:states}. The terminal square is the square whose state contains the target object, or observation. The grid size can be adjusted to control the model's resolution: smaller squares will increase accuracy, but at the cost of performance, both during use (more squares need to be traversed) and training (much larger state space). For the initial system design, we set the grid resolution to \SI{30}{\degree}.
 
-\subsection{MDP Design}
+\subsection{MDP for Human Control}
 
-\noindent The MDP model was used to produce a policy that defines a set of optimal actions for the agent to take in any given state. In this case, the agent is defined as the mobile phone and guidance system and the policy is used to generate the next waypoint on the search path towards the square on the grid that contains the target object. We initially assume perfect state and transition observability for each timestep and once we have a better understanding of the sensor limitations, we can expand the problem to a more sophisticated, and perhaps more representative, Partially Observable MDP (POMDP) problem. For now, the problem is given by the 5-tuple
+\noindent An MDP was used to produce a policy that defines a set of optimal actions for the agent to take in any given state. In this case, the agent is defined as the mobile phone and guidance system and the policy is used to generate the next waypoint on the search path towards the square on the grid that contains the target object. We initially assume perfect state and transition observability for each timestep. The problem is given by the 5-tuple
 
 \begin{equation}
-  <\mathbf{S}, \mathbf{A}, \mathbf{T}, \mathbf{R}, \gamma>, 
+  \langle{}\mathbf{S}, \mathbf{A}, \mathbf{T}, \mathbf{R}, \gamma\rangle, 
 \end{equation}
-where $\mathbf{S}$ is a set of possible states the agent can be in, $\mathbf{A}$ is a set of possible actions an agent can take in any given state, $\mathbf{T}$, is a set of state transition probabilities defining the probability of transitioning from state $s$ to state $s'$. $\mathbf{R}$ is the reward function defining the immediate reward the agent receives from executing an action $a$ in state $s$, and $\gamma$ is a discount factor which represents the models priority in maximising immediate rewards over long-term reward. Each of these elements are defined and discussed here.
+where $\mathbf{S}$ is a set of possible states the agent can be in, $\mathbf{A}$ is a set of possible actions an agent can take in any given state, $\mathbf{T}$, is a set of state transition probabilities defining the probability of transitioning from state $s$ to state $s'$. $\mathbf{R}$ is the reward function defining the immediate reward the agent receives reaching state $s'$ after executing action $a$ in state $s$, and $\gamma$ is a discount factor which maximises immediate over long-term rewards. Each of these elements are defined and discussed next.
+
+\subsubsection{Reward Function}
+
+\noindent The reward function, $r$, is the immediate reward that the agent receives after transitioning from state $s$ to state $s'$ and is given by 
+
+\begin{equation}
+  r = \langle{}s, s'\rangle, r\in{}\mathbf{R}.
+\end{equation} 
+
+The reward function is a very important parameter for training the agent to produce the most effective policy. We define a constant negative reward for every step the agent takes, and increase this negative reward if the agent exceeds the 12-step limit we defined in the model, as well as if it regenerates a waypoint in a previously searched location. The values used here are given in Table~\ref{tab:rewards}.
+
+\begin{table}
+  \centering
+  \caption{MEME}\label{tab:rewards}
+  \begin{tabular}{ll}
+    \toprule
+    $s\in\mathbf{S}$ & -1.0  \\ \midrule
+    $s(n >= 9)$ & -10.0 \\ \midrule
+    $s(v = 1)$  & -10.0 \\ \midrule
+    $s(o = \text{target})$ & 10000 \\ \midrule
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The goal of the agent is to maximise its cumulative reward over time and these numbers are chosen such that they actively motivate the agent to reach the target, while hastening the process by slightly punishing it for each step it takes and increasing the punishment every time it re-explores a state and the longer it takes to reach the target. 
 
 \subsubsection{States}\label{sec:states}
 
-\noindent The state is a combination of different trackable parameters that the agent may possess at any given time that defines the agent's decision process. The agent's state vector is given by 
+\noindent The state is a combination of parameters that defines the agent's decision process. The agent's state vector is given by 
 
 \begin{equation}
-  \mathbf{S} = s(o, n, s), 
+  s = \langle{}o, n, v\rangle, s\in{}\mathbf{S}, 
 \end{equation}
-where $o$ is the current observation, $n$ is the number of steps taken during the search and $s$ is a binary variable that tracks whether a pan/tilt position has been visited before during the search. There are 8 observations encoded into the system, including a `nothing' observation where nothing of note is observed, and they are also the possible targets. For an initial implementation, we are simulating a simple office and we selected the possible objects as objects one might typically expect to see in a normal office. These objects are
+where $o$ is the current object, $n$ is the number of steps taken since the search started and $v$ is a binary variable that tracks whether a pan/tilt position has been generated as a waypoint before during the search. There are 8 objects encoded into the system, including a `nothing' instance where nothing of note is observed. Our initial implementation considers a simple office desk scenario containing the following objects:
 
 \begin{equation}
   \begin{aligned}
-    o\in \{monitor, mouse, keyboard, window, mug,\\ office\;supplies, desk, nothing\}.
+    o\in \mathbf{O} = \{monitor, mouse, keyboard, window,\\mug, stationary, desk, nothing\}.
   \end{aligned}
 \end{equation}
 
-The model tracks a total of 12 steps to the target. We select 12 since the longest route one could take between the furthest corners on the 6$\times$6 grid we used is 12. The MDP therefore has a total of 216 possible states ($8\times12\times2$).
+Our implementation is designed for a 6$\times$6 discretised, radial grid for convenience and replicability through different experiments. The grid spans \SI{180}{\degree} in the pan and tilt dimensions, giving a grid resolution of \SI{30}{\degree} per grid square. We set the model to track a maximum of of 9 steps to the target, with 9 being the longest possible route on the grid. A search can take longer than 9 steps, but the MDP considers anything greater than 9 steps as the maximum, which is convenient for keeping a manageable state-space and a simple reward function. The MDP therefore has a total of 144 possible states ($8\times9\times2$).
 
 \subsubsection{Actions}
 
-The policy produced by an MDP define the action an agent will take when it finds itself in any given state. In this case, the action is the direction the user should move towards in a grid-world context, i.e.\ the angular adjustment the user must make to the camera to move along the search path. This action is interpreted by the guidance system and a new waypoint is added to the search path toward the target object. The action is defined by
+The policy produced by an MDP define the action an agent will take when it finds itself in any given state. In this case, the action is the direction the user should move towards in a grid-world context, i.e.\ the angular adjustment the user must make to the camera to move along the search path. This action is interpreted by the guidance system and a new waypoint is added to the search path toward the target object. The possible actions are defined by
 
 \begin{equation}
-  \mathbf{A} = a(s),
+  a = \langle{}s\rangle, a\in{}\mathbf{A},
 \end{equation}
 and the possible actions are
 
 \begin{equation}
-  a\in \{UP, DOWN, LEFT, RIGHT\}.
+  \mathbf{A} = \{UP, DOWN, LEFT, RIGHT\}.
 \end{equation}
-
-The number of actions can of course be expanded to increase resolution, but for this experiment and grid setup, they are sufficient. 
+These actions were chosen to conform to the grid implementation and increase the tracking performance of $u^*$ w.r.t\@ $u$. 
 
 \subsubsection{State Transition Probabilities}
 
-\noindent The state transition function, $\mathbf{T}$, defines the likelihood of the agent transitioning into a state $s'$ from state $s$ when taking an action $a$, i.e.\ the likelihood of moving into a square and making observation $o$ after performing action $a$. It therefore contains the spatial relationships between the different objects in the observation set. Formally, the transition function is defined by
+\noindent The state transition function, $\mathbf{T}$, defines the likelihood of the agent transitioning into a state $s'$ from state $s$ when taking an action $a$, i.e.\ the likelihood of moving into a square and observing object $o$ after performing action $a$. It therefore represent the spatial relationships between the different objects in the environment model. Formally, the transition function is defined by
 
 \begin{equation}
-  T(s, a, s') = t.
+  t\langle{}s, a, s'\rangle, t\in{}\mathbf{T}.
 \end{equation}
 
-The spatial relationships are extracted from Google's OpenImage dataset\footnote{https://storage.googleapis.com/openimages/web/index.html}~\cite{openimages}. This dataset consists of 1.74M images containing 14.6M labelled bounding boxes manually drawn around objects and is primarily aimed toward object recognition researchers to test their models on. However, with the bounding boxes and object labels we can extract the spatial relationships between the different objects in our observation set. Since the camera perspectives and absolute distances between the objects in the images aren't given, we can only extract the relationships in simple terms with little context, e.g.\ we can only say that object 1 is above object 2, but not how far above. Our simple action-space and grid environment somewhat compensates for this lack of complexity in the dataset. 
+The spatial relationships between the objects in $\mathbf{O}$ are extracted from the OpenImage dataset\footnote{https://storage.googleapis.com/openimages/web/index.html}~\cite{openimages}. This dataset consists of 1.74M images containing 14.6M labelled bounding boxes manually drawn around objects (see Figure~\ref{fig:openimage-example} for an example) and is primarily aimed toward object recognition researchers to test their models on. However, using the bounding boxes and object labels we can extract the spatial relationships between the different objects in $\mathbf{O}$. Since the camera perspectives and absolute distances between the objects in the images are not given, we can only extract the relationships in terms of the actions specified in $\mathbf{A}$, e.g.\ we can only say that object 1 is above object 2, but not how far above. Our simple action-space and grid environment somewhat compensates for this lack of complexity in the dataset. 
 
-\subsubsection{Reward Function}
-
-\noindent The reward function, $\mathbf{R}$, is the immediate reward that the agent receives after transitioning from state $s$ to state $s'$ and is given by 
-
-\begin{equation}
-  \mathbf{R} = r(s, s').
-\end{equation} 
-This is an important parameter for training the agent to produce the most effective policy. 
-
-During training, we define a negative reward for exceeding the 12-step limit we defined in the model, as well as if it re-enters a previous search location. Conversely, the agent is given a significant reward when it finds the target object. The goal of the agent is to maximise its cumulative reward over time. These numbers are chosen such that they motivate the agent to reach the target, while hastening the process by punishing it every time it re-explores a state and the longer it takes to reach the target. 
+\begin{figure}
+  \centering
+  \begin{subfigure}
+    \centering
+    \includegraphics[width=0.4\textwidth]{figures/desk_example.png}
+  \end{subfigure}
+  \begin{subfigure}
+    \centering
+    \includegraphics[width=0.4\textwidth]{figures/mug_example.png}
+  \end{subfigure}
+  \caption{MEME~\cite{openimages}}\label{fig:openimage-example}
+\end{figure}
 
 \subsubsection{Model Training}
 
-\noindent The policy is generated through a training process where the agent is placed in an environment with some constraints and attempts to maximise its short- and long-term reward through interacting with the environment. This problem is solved as an optimisation problem, where the agent will potentially start with a very inefficient, or wholly ineffective, policy and over time and many iterations, improve its policy and reach the target in an optimum number of timesteps. 
+\noindent The output of an MDP is a so-called policy that defines the action an agent will take when it is in any given state. A policy is generated by having an agent explore the entire state-space and through many iterations improve its decision function, i.e.\ policy, in order to reach the target state in a way that maximises its cumulative reward. This method is called Q-learning and does not require a model of its environment during training. 
 
-The training environment is a simple mathematical representation of the grid-world described in Sec.~\ref{sec:env-design} that have the following constraints during training to optimise the agent's search strategy:
+The agent's target state is any state combination where $o$ is the target object, since we are primarily concerned with finding the target object. Each target object has its own unique policy file and there are 18 terminal state in total (9$\times$2) per policy.
 
-\begin{itemize}
-  \item the agent must face forward, i.e.\ viewing angle must be less than \SI{90}{\degree} from the vertical and horizontal planes,
-  \item the agent can only move one square (angle interval) at a time, 
-  \item the process terminates when the target object is observed,
-\end{itemize}
+The lack of absolute spatial information in the OpenImage dataset generates ambiguities which makes it hard for the model to converge to a single, optimal solution. We therefore could not use the popular value iteration algorithm~\cite{bellman1957markovian} and opted for the state-action-reward-state-action (SARSA) algorithm~\cite{rummery1994line} instead. SARSA is an on-policy algorithm with the advantage of being more exploratory in nature and is therefore more likely to find a solution, but this solution is not guaranteed to be optimal. Our MDP has a relatively small state-action space. Therefore, a solution can be found in a reasonable amount of time. However, it should be noted that adjusting the angle interval, or adding more actions or objects, can easily blow up the size of the state-space. 
 
-The lack of absolute spatial information in the OpenImage dataset made the data seem fairly ambiguous in some cases, which makes it hard to find a single, optimal solution to the problem. We therefore could not use the popular value iteration algorithm~\cite{bellman1957markovian} and opted for the state-action-reward-state-action (SARSA) algorithm~\cite{rummery1994line} instead. SARSA is an on-policy algorithm with the advantage of being more exploratory in nature and is therefore more likely to find a solution. However, this solution is not guaranteed to be optimal, but can get very close to the optimal solution. This is a fairly simple MDP with a relatively small state-action-observation space, which makes it possible to find a solution in a reasonable amount of time. However, it should be noted that adjusting the angle interval or adding more actions or observations can easily blow up the size of the state-space. 
-
-\section{\uppercase{Experiments}}]\label{sec:experiments}
+\section{\uppercase{Experiments}}\label{sec:experiments}
 
 \noindent To test the effectiveness of the policy the MDP produced, we designed a set of experiments that determined how effective the system is at directing a participant to pointing towards a target object. This section discusses all of the simulations and experiments that were carried out. 
 
