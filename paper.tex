@@ -4,6 +4,7 @@
 \usepackage{color}
 \usepackage{multirow}
 \usepackage{booktabs}
+\usepackage[normalem]{ulem}
 
 \usepackage{epsfig}
 \usepackage{subfigure}
@@ -47,20 +48,21 @@
 
 \section{\uppercase{Introduction}}
 
-\noindent We are designing an indoor navigation system (ActiVis) targeted towards enabling blind and visually impaired (VI) users to safely navigate towards their desired destination or find an object in an unknown and dynamic environment, expanding upon ideas originally proposed in~\cite{bellotto2013} and expanded on in~\cite{lock2017portable}. The proposed system implements ideas from the active vision field and places a human in the control loop. This control loop, pictured in Figure~\ref{fig:control-loop}, comprises of a controller, $K$, that is given a reference signal (the desired objects in this case) that generates a control signal, $u$, which a human, $H$, uses to manipulate a sensor, $P$, to gather more information on the environment and move closer to the target object. %The goal of this system is to automatically make sense of the user's surroundings and determine the optimal route to get to the final destination based on what the user/camera sees, thereby roughly emulating a normally sighted user's navigation strategy in an unknown environment.
+\noindent It is estimated that there are 440 million people worldwide that live with mild to severe visual impairments or total blindness~\cite{bourne2017magnitude} and significant effort is being made to enable sufferers to lead more normal and independent lives. Modern improvements to mobile computing and image processing techniques have provided researchers with new and exciting tools to solve this problem.
 
-In this paper we discuss the first steps we have taken into implementing the control-block, $K$, from Figure~\ref{fig:control-loop}. The goal of ActiVis is to understand the user's surroundings and determine what the next best course of action is to reach the target location, based on what the it is currently seeing and what it has seen in the past. We used a Markov Decision Process (MDP)~\cite{bellman1957markovian} to produce a so-called policy that defines the optimal action, $a$, our agent (the guidance system in this case) takes when it is in some state $s$.  
+The ActiVis project will contribute to this effort by delivering an indoor navigation system targeted towards enabling blind and visually impaired (VI) users to safely navigate towards their desired destination or find an object in an unknown and dynamic environment with minimal user input. The proposed system implements ideas from the field of active vision, but places a human in the control loop, pictured in Figure~\ref{fig:control-loop} instead of a electro-mechanical servo. This project expands upon concepts originally proposed in~\cite{bellotto2013} and~\cite{lock2017portable}.
+
+The goal of ActiVis is to understand the user's surroundings and determine what the next best course of action is to reach the target location based on what the it is currently seeing and what it has seen in the past. We used a Markov Decision Process (MDP)~\cite{bellman1957markovian} to produce a so-called policy that defines the optimal action our agent (the guidance system in this case) takes when it finds itself in any state.  
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.4\textwidth]{figures/control_loop.png}
+  \includegraphics[width=0.45\textwidth]{figures/control_loop.png}
   \caption{The ActVis system layout and control loop. }\label{fig:control-loop}
 \end{figure}
 
+This work's main contribution is the design of a guidance system and MDP (the control-block, $K$, pictured in Figure~\ref{fig:control-loop}) that can drive a user to point a mobile device's camera towards a given point in space in and find a target object. We also present and discuss preliminary experimental results to show how effective the system is at finding a target. This guidance system will be implemented into the ActiVis project upon successful tests. 
 
-This work's main contribution is the design of a guidance system and MDP that can drive a user to point a mobile device's camera towards a given point in space in and find a target object. We also present and discuss preliminary experimental results to show how effective the system is at finding a target.
-
-Section~\ref{sec:previous-work} discusses other relevant work done in this field, followed by a detailed discussion on the design of the ActiVisguidance  system, human-control module and MDP\@ in Sections~\ref{sec:system-design} and~\ref{sec:controller-design}. Then we discuss the experiment and present its results in Section~\ref{sec:experiments}, after which we conclude the paper and discuss the project's next steps in Section~\ref{sec:conclusion}. 
+Section~\ref{sec:previous-work} discusses other relevant work done in this field, followed by a detailed discussion on the design of the ActiVis guidance system, human-control module and MDP\@ in Sections~\ref{sec:system-design} and~\ref{sec:controller-design}. Then we discuss the experiment and present its results in Section~\ref{sec:experiments}, after which we conclude the paper and discuss the project's next steps in Section~\ref{sec:conclusion}. 
 
 \section{\uppercase{Previous Work}}\label{sec:previous-work}
 
@@ -70,17 +72,17 @@ Another approach is to discard tags completely and rely on computer vision to pe
 
 As shown here, much research has been performed on object recognition and guidance towards an object once detected. However, work on active object search is harder to come by. Therefore, in this work we attempt to implement an active vision~\cite{aloimonos1988active,bellotto2013,lock2017portable} that can guide a user towards an out-of-view target object by using prior knowledge of the spatial distribution of objects within an indoor environment and the history of past object observations made during the search. With this, we hope to make the searching process less random and move towards a more natural search object searching process to the benefit of the VI\@.  
 
-\section{\uppercase{Active Vision System Design}}\label{sec:system-design}
+\section{\uppercase{Active Vision System}}\label{sec:system-design}
 
-\noindent The ActiVis project's goal is to deliver a stand-alone system that is capable of accepting user input on a target object\textbackslash{}destination and guide a VI user to it. A complete system diagram is given is Figure~\ref{fig:control-loop} and consists of a number of elements, or blocks
+\noindent The ActiVis project's goal is to deliver a stand-alone system that only requires a VI user's input for selecting a target object\textbackslash{}destination and then guide the user to it. A complete system diagram is given is Figure~\ref{fig:control-loop} and consists of a number of elements.
 
-From Figure~\ref{fig:control-loop}, it can be seen that the system layout is similar to that of a classical control problem where a controller generates a control signal that drives a component towards some reference point. In this case, the reference signal, $r$, is the object the user wishes to find, which the system can achieve by placing that object within the camera's view. Therefore, the goal of the control block, $K$, is to generate guidance instructions, $u$, in the form of visual or audio instructions, to drive the along a search path. Since we are not working with a electro-mechanical system, we have an extra suer block, $H$, that interprets $u$ and executes a physical action, $u^*$, that manipulates the sensor, $P$, to point in another direction and make a new observation. The cycle is repeated if the target object is not observed.  
+The system design loop is similar to that of a classical control problem where a controller generates a control signal that drives a component towards some reference point. In this case, the reference signal, $r$, is the object the user wishes to find which is achieved by placing the target object within the camera's view. Therefore, the goal of the control block, $K$, is to generate guidance instructions, $u$ to drive the user along a search path towards the target object. Since we place a human in the control loop and are not working with a electro-mechanical system, we have an extra block, $H$, that interprets $u$ and executes a physical action, $u^*$, that manipulates the sensor, $P$, that makes a new observation. The new observation is then fed back to the loop and the error signal, $e$, is updated accordingly.  
 
-This work focusses on implementing $K$ and there are 2 points of interest to implementing such a controller successfully. Firstly, $K$ must be environment-agnostic, meaning that it cannot be constrained to specific environment since objects are not necessarily placed in the same place in every environment. Secondly, the controller must be robust enough to handle a badly interpreted $u$ signal. The risk of that happening can be minimised by generating clear and simple signals, ensuring $u^*$ closely tracks the original signal, $u$. 
+This work focusses on implementing $K$ and there are 2 points of interest to implementing such a controller successfully. Firstly, $K$ must be environment-agnostic, meaning that it cannot be constrained to specific environment since objects are not necessarily placed in the same place in every environment. Secondly, the controller must be robust enough to handle a badly interpreted $u$ signal. The risk of that happening can be minimised by generating clear and simple signals to help ensure that $u^*$ closely tracks $u$. 
 
 \section{\uppercase{Human-control Module}}\label{sec:controller-design}
 
-\noindent The guidance system is built into an Android app with Android's ARCore~\footnote{https://developers.google.com/ar/} API enabled and is designed with the goal of generating a path of waypoints for the user to follow with a camera that will lead to the target object. This path is generated one waypoint at a time by the system and is updated with every object observation the user makes when adjusting the camera. We modelled this optimal path search problem as a grid-world problem that is solved by an Markov Decision Process (MDP) model. The details of the grid layout and the MDP model are discussed in the sections below. %For this initial design, the system only works in the pan and tilt dimension and the depth dimension will be added after successful testing of this version of the guidance system.
+\noindent The guidance system is built into an Android app and uses Android's ARCore\footnote{https://developers.google.com/ar/} API to track the device's pose. The system is designed with the goal of generating a path of waypoints for the user to follow, by pointing the device camera, that will lead the user to the target object. This path is generated one waypoint at a time by the system and is updated with every object observation the user makes after adjusting the camera. We modelled and solved the search problem using an Markov Decision Process (MDP) model. The details of the MDP model design and implementation are discussed in the sections below. %For this initial design, the system only works in the pan and tilt dimension and the depth dimension will be added after successful testing of this version of the guidance system.
 
 %\subsection{Environment Model}\label{sec:env-design}
 
@@ -96,78 +98,59 @@ This work focusses on implementing $K$ and there are 2 points of interest to imp
 
 \subsection{MDP for Human Control}
 
-\noindent An MDP was used to produce a policy that defines a set of optimal actions for the agent to take in any given state. In this case, the agent is defined as the mobile phone and guidance system and the policy is used to generate the next waypoint on the search path towards the square on the grid that contains the target object. We initially assume perfect state and transition observability for each timestep. The problem is given by the 5-tuple
+\noindent An MDP is used to produce a policy that defines a set of optimal actions for an agent to take in any given pre-defined state. In this case, the agent is defined as the guidance system and the policy is used to generate the next waypoint on the search path towards the target object. We assume perfect state and transition observability for each timestep and the problem is given by the 5-tuple
 
 \begin{equation}
-  \langle{}\mathbf{S}, \mathbf{A}, \mathbf{T}, \mathbf{R}, \gamma\rangle, 
+  (\text{R}, \mathbf{S}, \mathbf{A}, \mathbf{T}, \gamma), 
 \end{equation}
-where $\mathbf{S}$ is a set of possible states the agent can be in, $\mathbf{A}$ is a set of possible actions an agent can take in any given state, $\mathbf{T}$, is a set of state transition probabilities defining the probability of transitioning from state $s$ to state $s'$. $\mathbf{R}$ is the reward function defining the immediate reward the agent receives reaching state $s'$ after executing action $a$ in state $s$, and $\gamma$ is a discount factor which maximises immediate over long-term rewards. Each of these elements are defined and discussed next.
+where $\text{R}$ is the reward function defining the immediate reward the agent receives for reaching state $s'$ after executing action $a$ in state $s$, $\mathbf{S}$ is a set of possible states the agent can be in and $\mathbf{A}$ is a set of possible actions an agent can take in any given state. $\mathbf{T}$ is a set of state transition probabilities defining the probability of transitioning from state $s$ to state $s'$ after executing action $a$ and $\gamma$ is a discount factor which prioritises immediate over long-term rewards and is set to 0.95 to maximise long-term reward. Each of these elements are defined and discussed next.
 
 \subsubsection{Reward Function}
 
-\noindent The reward function, $r$, is the immediate reward that the agent receives after transitioning from state $s$ to state $s'$ and is given by 
+\noindent The reward function, $R$, is the immediate reward that the agent receives after transitioning from state $s$ to state $s'$ and is given by 
 
 \begin{equation}
-  r = \langle{}s, s'\rangle, r\in{}\mathbf{R}.
+  R = r(s, s').
 \end{equation} 
 
-The reward function is a very important parameter for training the agent to produce the most effective policy. We define a constant negative reward for every step the agent takes, and increase this negative reward if the agent exceeds the 12-step limit we defined in the model, as well as if it regenerates a waypoint in a previously searched location. The values used here are given in Table~\ref{tab:rewards}.
+The goal of the agent is to maximise the cumulative reward it receives and is a very important parameter for producing a good policy that will define the optimal action for the agent to execute for any given state. In order to encourage the agent to actively search for the target object, a set of negative rewards must be defined, along with a relatively large positive reward for successfully reaching the target object. These parameters must be finely balanced to ensure efficient object search behaviour from the agent.
 
-\begin{table}
-  \centering
-  \caption{A table containing the model rewards for our MDP. }\label{tab:rewards}
-  \begin{tabular}{ll}
-    \toprule
-    $s\in\mathbf{S}$ & -1.0  \\ \midrule
-    $s(n >= 9)$ & -10.0 \\ \midrule
-    $s(v = 1)$  & -10.0 \\ \midrule
-    $s(o = \text{target})$ & 10000 \\ \midrule
-    \bottomrule
-  \end{tabular}
-\end{table}
+%The reward function is a very important parameter for training the agent to produce the most effective policy. We define a constant negative reward for every step the agent takes, and increase this negative reward if the agent exceeds the 12-step limit we defined in the model, as well as if it regenerates a waypoint in a previously searched location. The values we used were empirically chosen and are given in Table~\ref{tab:rewards}.
 
-The goal of the agent is to maximise its cumulative reward over time and these numbers are chosen such that they actively motivate the agent to reach the target, while hastening the process by slightly punishing it for each step it takes and increasing the punishment every time it re-explores a state and the longer it takes to reach the target. 
+%The goal of the agent is to maximise its cumulative reward over time and these numbers are chosen such that they actively motivate the agent to reach the target, while hastening the process by slightly punishing it for each step it takes and increasing the punishment every time it re-explores a state and the longer it takes to reach the target. 
 
 \subsubsection{States}\label{sec:states}
 
-\noindent The state is a combination of parameters that defines the agent's decision process. The agent's state vector is given by 
+\noindent The state is a combination of parameters that defines the agent's world and decision process. The agent's state vector is given by 
 
 \begin{equation}
   s = \langle{}o, n, v\rangle, s\in{}\mathbf{S}, 
 \end{equation}
-where $o$ is the current object, $n$ is the number of steps taken since the search started and $v$ is a binary variable that tracks whether a pan/tilt position has been generated as a waypoint before during the search. There are 8 objects encoded into the system, including a `nothing' instance where nothing of note is observed. Our initial implementation considers a simple office desk scenario containing the following objects:
-
-\begin{equation}
-  \begin{aligned}
-    o\in \mathbf{O} = \{monitor, mouse, keyboard, window,\\mug, stationary, desk, nothing\}.
-  \end{aligned}
-\end{equation}
-
-Our implementation is designed for a 6$\times$6 discretised, radial grid for convenience and replicability through different experiments. The grid spans \SI{180}{\degree} in the pan and tilt dimensions, giving a grid resolution of \SI{30}{\degree} per grid square. We set the model to track a maximum of of 9 steps to the target, with 9 being the longest possible route on the grid. A search can take longer than 9 steps, but the MDP considers anything greater than 9 steps as the maximum, which is convenient for keeping a manageable state-space and a simple reward function. The MDP therefore has a total of 144 possible states ($8\times9\times2$).
+where $o$ is the current object in view, $n$ is the number of steps taken since the search started and $v$ is a binary variable that tracks whether a waypoint has been generated in the same pan/tilt position before during the search. 
 
 \subsubsection{Actions}
 
-The policy produced by an MDP define the action an agent will take when it finds itself in any given state. In this case, the action is the direction the user should move towards in a grid-world context, i.e.\ the angular adjustment the user must make to the camera to move along the search path. This action is interpreted by the guidance system and a new waypoint is added to the search path toward the target object. The possible actions are defined by
+The policy produced by an MDP define the action an agent will take when it finds itself in any given state. In this case, the action is the direction the next waypoint should be generated relative to the device's current view pose. The actions are defined by
 
 \begin{equation}
   a = \langle{}s\rangle, a\in{}\mathbf{A},
 \end{equation}
-and the possible actions are
+\uline{and the possible actions are}
 
 \begin{equation}
   \mathbf{A} = \{UP, DOWN, LEFT, RIGHT\}.
 \end{equation}
-These actions were chosen to conform to the grid implementation and increase the tracking performance of $u^*$ w.r.t\@ $u$. 
+%These actions were chosen to conform to the grid implementation and increase the tracking performance of $u^*$ w.r.t\@ $u$. 
 
 \subsubsection{State Transition Probabilities}
 
-\noindent The state transition function, $\mathbf{T}$, defines the likelihood of the agent transitioning into a state $s'$ from state $s$ when taking an action $a$, i.e.\ the likelihood of moving into a square and observing object $o$ after performing action $a$. It therefore represent the spatial relationships between the different objects in the environment model. Formally, the transition function is defined by
+\noindent The state transition function, $\mathbf{T}$, defines the likelihood of the agent transitioning into a state $s'$ from state $s$ when taking an action $a$, i.e.\ the likelihood of moving to a new pan/tilt position and observing object $o$ after performing action $a$. Therefore, it represent the spatial relationships between the different objects in the environment model. Formally, the transition function is defined by
 
 \begin{equation}
   t\langle{}s, a, s'\rangle, t\in{}\mathbf{T}.
 \end{equation}
 
-The spatial relationships between the objects in $\mathbf{O}$ are extracted from the OpenImage dataset\footnote{https://storage.googleapis.com/openimages/web/index.html}~\cite{openimages}. This dataset consists of 1.74M images containing 14.6M labelled bounding boxes manually drawn around objects (see Figure~\ref{fig:openimage-example} for an example) and is primarily aimed toward object recognition researchers to test their models on. However, using the bounding boxes and object labels we can extract the spatial relationships between the different objects in $\mathbf{O}$. Since the camera perspectives and absolute distances between the objects in the images are not given, we can only extract the relationships in terms of the actions specified in $\mathbf{A}$, e.g.\ we can only say that object 1 is above object 2, but not how far above. Our simple action-space and grid environment somewhat compensates for this lack of complexity in the dataset. 
+The spatial relationships between the objects in $\mathbf{O}$ are extracted from the OpenImage dataset\footnote{https://storage.googleapis.com/openimages/web/index.html}~\cite{openimages} that consists of 1.74M images containing 14.6M manually drawn and labelled bounding boxes around objects (see Figure~\ref{fig:openimage-example} for an example) and is primarily aimed toward object recognition researchers to test their models on. Using the bounding boxes and object labels, we can extract the spatial relationships between the different objects in $\mathbf{O}$. Since the camera perspectives and absolute distances between the objects in the images are not given, we can only extract the relationships in the basic action terms specified in $\mathbf{A}$, e.g.\ we can only say that object 1 is above object 2, but not how far above. Our simple action-space and grid environment somewhat compensates for the dataset's lack of complexity. 
 
 \begin{figure}
   \centering
@@ -179,30 +162,47 @@ The spatial relationships between the objects in $\mathbf{O}$ are extracted from
     \centering
     \includegraphics[width=0.4\textwidth]{figures/mug_example.png}
   \end{subfigure}
-  \caption{Examples of images from the OpenImage dataset containing objects from $\mathit{O}$~\cite{openimages}}\label{fig:openimage-example}
+  \caption{Examples of images from the OpenImage dataset containing objects from $\mathit{O}$~\cite{openimages}. }\label{fig:openimage-example}
 \end{figure}
+
+\subsection{MDP Implementation}
 
 \subsubsection{Model Training}
 
-\noindent The output of an MDP is a so-called policy that defines the action an agent will take when it is in any given state. A policy is generated by having an agent explore the entire state-space and through many iterations improve its decision function, i.e.\ policy, in order to reach the target state in a way that maximises its cumulative reward. This method is called Q-learning and does not require a model of its environment during training. 
+\noindent A policy that defines the optimal action for an agent to take for any given state is generated through a training process that involves letting the agent explore the entire state-space and iteratively improve its decision function, i.e.\ policy, in order to reach the target state in a way that maximises its cumulative reward. This method is called Q-learning and does not require a model of its environment during training. 
 
-The agent's target state is any state combination where $o$ is the target object, since we are primarily concerned with finding the target object. Each target object has its own unique policy file and there are 18 terminal state in total (9$\times$2) per policy.
+For our system, the agent's target state is any state where $s = \langle{}o_{target}, n, v\rangle$. Each target object has its own unique policy file and there are 18 terminal states in total (9$\times$2) per policy, since the target object can can be found at any point in the search or in a position that was previously explored by the agent and user. 
+
+The reward function was crafted by hand and the parameters were empirically selected. The function values can be found in Table~\ref{tab:rewards}. $R$ punishes the agent for every step it takes where it does not find the target object, and the negative reward is increased if the agent is taking too long to find the target ($n > n_{max}$) or when it wants to search in a site that has been searched already ($v = true$). Conversely, it gives a significant positive reward when the target object is found. 
+
+\begin{table}
+  \centering
+  \caption{A table containing the model rewards for our MDP.\ }\label{tab:rewards}
+  \begin{tabular}{ll}
+    \toprule
+    $r(s, s'), s\in\mathbf{S}$ & -1.0  \\ \midrule
+    $r(n >= n_{max})$ & -10.0 \\ \midrule
+    $r(v = true)$  & -10.0 \\ \midrule
+    $r(o = o_{target})$ & 10000 \\ \midrule
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Currently there are 8 objects encoded into the system, including a `nothing' instance where nothing of note is observed. Our initial implementation considers a simple office desk scenario containing the following objects:
+
+\begin{equation}
+  \begin{aligned}
+    o\in \mathbf{O} = \{monitor, mouse, keyboard, window,\\mug, stationary, desk, nothing\}.
+  \end{aligned}
+\end{equation}
+
+\uline{We set the model to track a maximum of of 9 steps to the target, with 9 being the longest possible route on the grid (more details about the grid are in Section~\ref{sec:system-implementation}). A search can take longer than 9 steps, but the MDP considers anything greater than 9 steps as the maximum, which is convenient for keeping a manageable state-space and a simple reward function. The MDP therefore has a total of 144 reachable states ($8\times9\times2$).}
 
 The lack of absolute spatial information in the OpenImage dataset generates ambiguities which makes it hard for the model to converge to a single, optimal solution. We therefore could not use the popular value iteration algorithm~\cite{bellman1957markovian} and opted for the state-action-reward-state-action (SARSA) algorithm~\cite{rummery1994line} instead. SARSA is an on-policy algorithm with the advantage of being more exploratory in nature and is therefore more likely to find a solution, but this solution is not guaranteed to be optimal. Our MDP has a relatively small state-action space. Therefore, a solution can be found in a reasonable amount of time. However, it should be noted that adjusting the angle interval, or adding more actions or objects, can easily blow up the size of the state-space. 
 
-\section{\uppercase{Experiments}}\label{sec:experiments}
+\subsubsection{Android Implementation}\label{sec:system-implementation}
 
-\noindent To test the effectiveness of the policy the MDP produced, we designed a set of experiments that determined how effective the system is at directing a participant to pointing towards a target object. This section discusses all of the simulations and experiments that were carried out. 
-
-\subsection{Experiment Design}
-
-\noindent To test the viability and effectiveness of our system, we carried out a set of experiments. For this, the MDP policies were integrated into an Android application that uses the camera to provide observation data and track the pose and viewing direction. We avoided adding unnecessary variability and complexity to the experiment by providing visual waypoints on screen which the participants were allowed to use. In addition to this, encoded QR codes and the Android barcode scanner library were used to simulate object detection. A generic environment mimicking a typical office desk layout was set up as the experiment environment and contains 7 different objects (i.e.\ encoded QR codes), one of which were the target object. See Figure~\ref{fig:env-picture} for a picture of the environment. 
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.4\textwidth]{figures/test_env_picture.jpg}
-  \caption{A picture of the environment used for the experiments. Each QR code represents an object. }\label{fig:env-picture}
-\end{figure}
+We incorporated the trained MDP model and policies into an Android app (see Figure~\ref{fig:system-screenshot} for a screenshot). This app is responsible for generating the guidance instructions and tracking the agent and sensor ($K$ and $P$ blocks in Figure~\ref{fig:control-loop}) throughout a search session. Tracking the agent's pose allows the app to infer the current state and look up the optimal action to take. 
 
 \begin{figure}
   \centering
@@ -210,81 +210,114 @@ The lack of absolute spatial information in the OpenImage dataset generates ambi
   \caption{A screenshot of the guidance interface showing a waypoint (based on an 3D Android model), the object scanner area and the guidance instruction arrows. }\label{fig:system-screenshot}
 \end{figure}
 
+The app uses a 6$\times$6 discretised and wrapped radial grid to simplify the tracking and waypoint generation processes. In this setup, the policy action is interpreted by the app and a new search waypoint is generated in the centre of the cell specified by the action, e.g.\ an `$UP$' action will generate a waypoint one grid cell up from where the suer is currently pointing the camera. The app's guidance system then uses the new waypoint's location to provide the user with guidance instructions. The grid is generated at the app's start-up and is tracked in absolute terms. However, the policy actions, and waypoints by extension, are given in relative terms (relative to the user's current viewing pan/tilt position). The grid spans \SI{120}{\degree} in both the pan and tilt dimensions, giving a resolution of \SI{20}{\degree} per grid cell. 
+
+By recording the previous positions and waypoint locations the app generated, it can infer the state values for $v$ and $n$. Furthermore, the camera provides the ID of the object in view, populating $o$ in the state. A real-time object detector was not used in this system to avoid unnecessary complexity and processing overhead and encoded QR codes and barcode scanner library were used to simulate object detection instead.
+
+\section{\uppercase{Experiments}}\label{sec:experiments}
+
+\noindent To test the effectiveness of our MDP and its policies, we designed a set of experiments that determined how effective the system is at directing a participant to point the device's camera towards a target object. This section discusses the experiments and their results. 
+
+\subsection{Experiment Design}
+
+\noindent For the experiment, the MDP policies were integrated into an Android application that uses the camera to provide observation data and track the pose and viewing direction. We avoided adding unnecessary variability and complexity to the experiment by providing visual waypoints on screen which the participants were allowed to use. A generic environment mimicking a typical office desk layout was set up as the experiment environment and contains 7 different objects (i.e.\ encoded QR codes), one of which could be selected for each experiment run. See Figure~\ref{fig:env-picture} for a picture of the environment. 
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.4\textwidth]{figures/test_env_picture.jpg}
+  \caption{A picture of the environment used for the experiments. Each QR code represents an object. OVERLAY GRID AND PRESENT EXAMPLE SEARCH}\label{fig:env-picture}
+\end{figure}
+
 For each experiment, the participant was placed roughly \SI{1}{\meter} from the barcodes and was asked not to move from that spot during the experiment. The participant then pressed a button on the app that randomly selected a target object and was then guided towards that target by the app. Since the participants were allowed to use their vision, the targets were randomly selected and the participants were uninformed of what the target object was until it was found. This was done to avoid the participants learning the target objects' locations between each search run.
 
-During in-house tests, we noted that the system sometimes makes guidance mistakes that lead the user towards the edge of the search space, at which point the system had difficulty guiding the user back to the centre. To avoid this having an adverse impact and drawing out the experiments too long, we set a search step limit of 16, which means that only 16 waypoints were be generated before the search was terminated. A search run therefore ended when the participant either successfully found the target object by pointing the phone camera to it and scanning the barcode, or exceeded the waypoint limit. After this, the participant then resets to the central position, selects a new target object and resumes the experiment.
+During in-house tests, we noted that the system sometimes makes guidance mistakes that lead the user towards an uncluttered edge of the search space, at which point the system had difficulty guiding the user back to the centre. To avoid this having an adverse impact and drawing out the experiments too long, we set a search step limit of 16, which means that only 16 waypoints were be generated before the search was terminated. A search run therefore ended when the participant either successfully found the target object by pointing the phone camera to it and scanning the barcode, or exceeded the waypoint limit. After this, the participant then resets to the central position, selects a new target object and resumes the experiment.
 
 The participants were left to repeat this process until we recorded 10 searches per object, giving us a total number of 70 recorded search samples per participant. We tested a total of 10 different participants (sex: 8 M, 2 F;\@ age: $\mu$ 31.2 years, $\sigma$ 8 years), most of which were sourced from our laboratory with none having any disabilities or handicaps. This gives our dataset a total of 700 search samples.
 
 \subsection{Results}
 
-\noindent In order to evaluate our system, we identified 3 different measures: target acquisition rate (TAR), number of steps to the target and the total time it took to find a target object. We present and discuss the results for each of these parameters in the next sections. All of the results are summarised in Table~\ref{tab:results-summary}.
+\noindent In order to evaluate our system, we identified 3 different measures: target acquisition rate (TAR), number of steps to the target and the total time it took to find a target object. We present and discuss the results for each of these parameters in the next sections. The results for each individual participant is presented in Table~\ref{tab:results-full} and Table~\ref{tab:results-summary} gives the results across all of the participants.
 
 \begin{table}
   \centering
-  \caption{A table containing a summary of the TAR, steps and time to target means ($\mu$) and standard deviations ($\sigma$) for each individual participant and the entire participant population.}\label{tab:results-summary}
+  \caption{A table containing the results for the TAR, number of steps and time to target means ($\mu$) and standard deviations ($\sigma$) for each individual participant.}\label{tab:results-full}
   \begin{tabular}{cc|cc|cc}
     \toprule
     \multirow{2}{*}{Participant} & \multirow{2}{*}{TAR [\%]} & \multicolumn{2}{c|}{Num. Steps} & \multicolumn{2}{c}{Time [s]} \\ 
 				 &			     & $\mu$ & $\sigma$		       & $\mu$ & $\sigma$  \\ \midrule
-    s1 & 6.3 & 7.2 & 5.4 & 29 & 22 \\ \midrule
-    s2 & 21 & 6.7 & 4.8 & 34 & 5.1 \\ \midrule
-    s3 & 8.8 & 6.3 & 4.9 & 31 & 21 \\ \midrule
-    s4 & 21 & 6.7 & 4.3 & 37 & 5.6 \\ \midrule
-    s5 & 24 & 7.2 & 4.9 & 33 & 14 \\ \midrule
-    s6 & 40 & 8.2 & 5.4 & 24 & 10 \\ \midrule
-    s7 & 14 & 8.5 & 5.8 & 31 & 16 \\ \midrule
-    s8 & 12 & 5.1 & 4.0 & 39 & 21 \\ \midrule
-    s9 & 2.5 & 7.2 & 5.4 & 39 & 18 \\ \midrule
-    s10 & 33 & 6.6 & 5.4 & 26 & 12 \\ \midrule\midrule
-    Population & $\mu$: 18 $\sigma$: 11 & 6.8 & 5.1 & 34 & 23 \\
+    s1 & 94 & 7.2 & 5.4 & 29 & 22 \\ \midrule
+    s2 & 79 & 6.7 & 4.8 & 34 & 5.1 \\ \midrule
+    s3 & 91 & 6.3 & 4.9 & 31 & 21 \\ \midrule
+    s4 & 79 & 6.7 & 4.3 & 37 & 5.6 \\ \midrule
+    s5 & 76 & 7.2 & 4.9 & 33 & 14 \\ \midrule
+    s6 & 60 & 8.2 & 5.4 & 24 & 10 \\ \midrule
+    s7 & 86 & 8.5 & 5.8 & 31 & 16 \\ \midrule
+    s8 & 88 & 5.1 & 4.0 & 39 & 21 \\ \midrule
+    s9 & 98 & 7.2 & 5.4 & 39 & 18 \\ \midrule
+    s10 & 67 & 6.6 & 5.4 & 26 & 12 \\ \midrule\midrule
+    % Population & $\mu$: 82 $\sigma$: 11 & 6.8 & 5.1 & 34 & 23 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}
+  \centering
+  \caption{A table summarising the means ($\mu$) and standard deviations ($\sigma$) for the entire participant population.}\label{tab:results-summary}
+  \begin{tabular}{lcc}
+    \toprule
+    & $\mu$ & $\sigma$ \\ \midrule
+    TAR [\%]   & 82  & 11  \\ \midrule
+    Num. Steps & 6.8 & 5.1 \\ \midrule
+    Time [s]   & 34  & 23  \\ \midrule
     \bottomrule
   \end{tabular}
 \end{table}
 
 \subsection{Target Acquisition Rate}
 
-\noindent The target acquisition rate (TAR) is a measure of how successful the system was at directing a participant to the target object within the 16-step limit we imposed and is simply calculated as a proportion of the number completed searches vs.\ the total number of searches. See Figure~\ref{fig:incomplete-searches-subjects} for a plot showing the TAR for each participant. Please note, however, that this plot is dependant on the step-limit we selected and should not be taken as an absolute measure of performance, but is rather presented to provide context to the other results we present. 
+\noindent The TAR is a measure of how successful the system was at directing a participant to the target object within the 16-step limit we imposed and is simply calculated as a proportion of the number completed searches vs.\ the total number of searches. See Figure~\ref{fig:complete-searches-subjects} for a plot showing the cumulative TAR for all the participants. Please note, however, that this plot is dependant on the step-limit we selected and should not be taken as an absolute measure of performance, but is rather presented to provide context to the other results we present. 
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{figures/incomplete_searches_subjects.png}
-  \caption{A plot giving the proportion of searches that reached the 16-step limit we imposed for each participant. }\label{fig:incomplete-searches-subjects}
+  \includegraphics[width=0.5\textwidth]{figures/cdf_tar.png}
+  \caption{A plot giving the cumulative proportion of searches that successfully found the target object before reaching the 16-step limit. }\label{fig:complete-searches-subjects}
 \end{figure}
 
-The inter-participant spread ($\sigma=11\%$) is fairly significant, perhaps indicating that the user's search behaviour and strategy affects the target acquisition performance  With an average TAR of $18.3\%$, it is clear that our system can be improved with regards to entering a no-recovery state where it directs a user into dead-space with no spatial information (e.g.\ a ceiling or wall section) and cannot gather the information it requires to intelligently guide the user. Subsequent system updates will have to consider implementing fall-back methods or other automatic recovery modes that can detect entry of a no-recovery state (e.g.\ exceeding a set number of steps/time without making an observation) and guide the user back to the initial position.
+Figure~\ref{fig:complete-searches-subjects} shows a fairly consistent spread for the TAR across the participants. The inter-participant spread ($\sigma=11\%$) is fairly significant, perhaps indicating that the user's search behaviour and strategy affects the target acquisition performance, but with an average TAR of $81.2\%$, it is clear that the system successfully finds the target object during the vast majority of searches. 
+
+The TAR can be improved with regards to entering a no-recovery state where it directs a user into dead-space with no spatial information (e.g.\ a ceiling or wall section) and cannot gather the information it requires to intelligently guide the user. Subsequent system updates will have to consider implementing fall-back methods or other automatic recovery modes that can detect entry of a no-recovery state (e.g.\ exceeding a set number of steps/time without making an observation) and guide the user back to the initial position.
 
 \subsection{Number of Steps to Target}
 
-\noindent The number of steps to target indicates the number of waypoints the system generated for the participant during the guidance process is a major indication of system performance, where less waypoints means better performance. Figure~\ref{fig:nsteps-participants} shows the distributions of the number of steps to the target for each individual participant. 
+\noindent The number of steps target indicates the number of waypoints the system generated for the participant during the guidance process and is a major indication of system performance, where less waypoints means faster target acquisition and better performance. Figure~\ref{fig:nsteps-participants} shows the cumulative distribution of the number of steps to the target for all the participants. 
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{figures/boxplot_nsteps_subjects.png}
-  \caption{The distributions of each participant's number of steps taken to find a target object. }\label{fig:nsteps-participants}
+  \includegraphics[width=0.5\textwidth]{figures/cdf_total_steps.png}
+  \caption{The cumulative distribution of the participants' number of steps taken to find a target object. }\label{fig:nsteps-participants}
 \end{figure}
 
-The number of waypoints each participant required is fairly consistent across all of the participants with a inter-participant standard deviation of 1 waypoint. The population mean and standard deviation is 6.8 and 5.1 waypoints respectively. This is a reasonable result that was also somewhat expected, since most target objects were placed within approximately 4 grid squares away from the participants' initial looking directions.
+The number of waypoints each participant required is fairly evenly spread across all of the participants. The population mean and standard deviation is 6.8 and 5.1 waypoints respectively. This is a reasonable result that was also somewhat expected, since most target objects were placed within approximately 4 grid squares away from the participants' initial looking directions. However, the relatively high standard deviation should be noted and can also be reduced by implementing the automatic recovery mode mentioned previously, and avoiding information-sparse areas.
 
-It is interesting to note that participants $s6$ and $s10$ also found their targets within these reasonable bounds when accounted for the targets that they found within the 16-step limit. This supports the argument from the previous results that their decreased TAR was partly caused by an abnormally high number of entries into a no-recovery state and further reinforces the need to implement an automatic recovery feature in the system before deployment. 
+% It is interesting to note that participants $s6$ and $s10$ also found their targets within these reasonable bounds when accounted for the targets that they found within the 16-step limit. This supports the argument from the previous results that their decreased TAR was partly caused by an abnormally high number of entries into a no-recovery state and further reinforces the need to implement an automatic recovery feature in the system before deployment. 
 
 \subsection{Time to Target}
 
-\noindent The total time it took a participant to reach the target object is given in Figure~\ref{fig:time-participants}. In it we see that the inter-participant variance in the temporal response, with mean 29.8s and standard deviation 6.2s (population standard deviation of 23s), is far greater than for the number of waypoints they required. Indeed, there is not a strong relationship between the number of waypoints a participant required and the time they took to find the target, as showcased by participant $s7$'s wide mean waypoint count and spread in Figure~\ref{fig:nsteps-participants} and the small spread and close-to-average time to target in Figure~\ref{fig:time-participants}. Furthermore, the opposite can be observed in participant $s8$'s small spread and low mean waypoint count in Figure~\ref{fig:nsteps-participants} and high spread and high mean time to target in Figure~\ref{fig:time-participants}. 
+\noindent The distribution of the total time it took the participants to reach the target object is given in Figure~\ref{fig:time-participants}. We see that the distribution is heavily skewed to the bottom with a long tail. The mean and standard deviation of the data is 29.8s and 23s respectively. %, is far greater than for the number of waypoints they required. Indeed, there is not a strong relationship between the number of waypoints a participant required and the time they took to find the target, as showcased by participant $s7$'s wide mean waypoint count and spread in Figure~\ref{fig:nsteps-participants} and the small spread and close-to-average time to target in Figure~\ref{fig:time-participants}. Furthermore, the opposite can be observed in participant $s8$'s small spread and low mean waypoint count in Figure~\ref{fig:nsteps-participants} and high spread and high mean time to target in Figure~\ref{fig:time-participants}. 
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{figures/boxplot_time_to_target_subjects.png}
-  \caption{The distributions of the each participant's time taken to find a target object. }\label{fig:time-participants}
+  \includegraphics[width=0.5\textwidth]{figures/cdf_total_time.png}
+  \caption{The cumulative distribution of the participants' time taken to find a target object. }\label{fig:time-participants}
 \end{figure}
 
-In comparison to the VizWiz system~\cite{bigham2010vizwiz} (mean 92s, standard deviation 37.7s), our results look fairly reasonable. However, our results may look very different when we test the system with VI participants like they did in~\cite{bigham2010vizwiz}.
+In comparison to the VizWiz system~\cite{bigham2010vizwiz} (mean 92s, standard deviation 37.7s), our results look very reasonable. However, these results may greatly change when we test the system with VI participants like they did in~\cite{bigham2010vizwiz}.
 
 \section{\uppercase{Future Work and Conclusion}}\label{sec:conclusion}
 
-\noindent In this work we presented and tested an MDP-based system to guide a visually impaired (VI) person towards a target object with no apriori knowledge of the environment. We implemented the system in an Android app that we tested with a small group of sighted people to determine its viability and effectiveness at guiding user at finding and pointing a camera at a specific target. We found that is works fairly well when compared to alternative systems, with a respectable mean time of target acquisition of 32s. However, the system can be improved by refining the search strategy and implementing an automatic fail-state recovery system that will guide a user back to neutral position if a fail-state is entered (e.g.\ a blank section of wall). 
+\noindent In this work we presented and tested an MDP-based system to guide a visually impaired (VI) person towards a target object with no apriori knowledge of the environment. We implemented the system in an Android app that we tested with a small group of sighted people to determine its viability and effectiveness at guiding a user to manipulating a camera and finding a target object. We found that is works well when compared to alternative systems, with a respectable mean time of target acquisition of 32s. However, the system can be improved by refining the search strategy and implementing an automatic fail-state recovery system that will guide a user back to neutral position if a fail-state is entered (e.g.\ a blank section of wall). 
 
-The next steps to this project will involve using the data recorded here to improve and refine the MDP model that provides the guidance. The model can also be expanded to include more objects and actions. However, an important consideration and expansion to the problem is to change the MDP to an Partially Observable MDP (POMDP) that will bring the model more in line with reality by acknowledging that the objects are not perfectly observable and humans do not perfectly follow guidance instructions. This adjustment may be very important when we consider that we will replace the QR code detector with object recognition models that are typically more prone to making classification errors. Finally, the model can be adapted to use on-line learning techniques in order to further refine its transition model as the user uses the guidance system. 
+The next steps to this project will involve using the data recorded here to improve and refine the MDP model that provides the guidance. The model can also be expanded to include more objects and actions. However, an important consideration and expansion to the problem is to change the MDP to an Partially Observable MDP (POMDP) model that will bring the model more in line with reality by acknowledging that the objects are not perfectly observable and humans do not perfectly follow guidance instructions. This adjustment may be very important when we replace the QR code scanner with an object recognition that are typically more prone to making classification errors. Finally, the model can be adapted to use on-line learning techniques in order to further refine its transition model as the guidance system is used.  
 
 \clearpage
 \bibliographystyle{apalike}
