@@ -30,7 +30,7 @@
 
 \begin{document}
 
-\title{Designing an Active Vision Indoor Object Search Guidance System} 
+\title{Designing an Agent for an Active Guidance System for Object Search} 
 
 \author{
   \authorname{John Anon{\sup{1}}}
@@ -42,7 +42,7 @@
 
 \keywords{Active vision, object search, vision impaired, Markov decision process}
 
-\abstract{In this work, we propose an active vision system that uses a Markov Decision Process and mobile phone to enable a user to find an object in an unknown environment. An initial implementation of this system was implemented and tested with a set of experiments were carried out with sighted participants to determine the effectiveness of the system. We found that the system works reasonably well and compares well to similar systems. }
+\abstract{In this work, we propose a Markov Decision Process-based system that generates guidance instructions for a user to find a target object in an unknown environment and forms part of an active vision indoor guidance system for the visually impaired. An initial implementation of this system was implemented in an Android app and a set of experiments were carried out with sighted participants to determine its effectiveness. We found that the system works reasonably well and compares well to similar systems. }
 
 \onecolumn \maketitle \normalsize \vfill
 
@@ -135,7 +135,7 @@ The policy produced by an MDP define the action an agent will take when it finds
 \begin{equation}
   a = \langle{}s\rangle, a\in{}\mathbf{A},
 \end{equation}
-\uline{and the possible actions are}
+and the possible actions are
 
 \begin{equation}
   \mathbf{A} = \{UP, DOWN, LEFT, RIGHT\}.
@@ -196,7 +196,7 @@ Currently there are 8 objects encoded into the system, including a `nothing' ins
   \end{aligned}
 \end{equation}
 
-\uline{We set the model to track a maximum of of 9 steps to the target, with 9 being the longest possible route on the grid (more details about the grid are in Section~\ref{sec:system-implementation}). A search can take longer than 9 steps, but the MDP considers anything greater than 9 steps as the maximum, which is convenient for keeping a manageable state-space and a simple reward function. The MDP therefore has a total of 144 reachable states ($8\times9\times2$).}
+We set the model to track a maximum of of 9 steps to the target, with 9 being the longest possible route on the grid (more details about the grid are in Section~\ref{sec:system-implementation}). A search can take longer than 9 steps, but the MDP considers anything greater than 9 steps as the maximum, which is convenient for keeping a manageable state-space and a simple reward function. The MDP therefore has a total of 144 reachable states ($8\times9\times2$).
 
 The lack of absolute spatial information in the OpenImage dataset generates ambiguities which makes it hard for the model to converge to a single, optimal solution. We therefore could not use the popular value iteration algorithm~\cite{bellman1957markovian} and opted for the state-action-reward-state-action (SARSA) algorithm~\cite{rummery1994line} instead. SARSA is an on-policy algorithm with the advantage of being more exploratory in nature and is therefore more likely to find a solution, but this solution is not guaranteed to be optimal. Our MDP has a relatively small state-action space. Therefore, a solution can be found in a reasonable amount of time. However, it should be noted that adjusting the angle interval, or adding more actions or objects, can easily blow up the size of the state-space. 
 
@@ -206,7 +206,7 @@ We incorporated the trained MDP model and policies into an Android app (see Figu
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.3\textwidth]{figures/system_screenshot.png}
+  \includegraphics[width=0.45\textwidth]{figures/system_screenshot2.png}
   \caption{A screenshot of the guidance interface showing a waypoint (based on an 3D Android model), the object scanner area and the guidance instruction arrows. }\label{fig:system-screenshot}
 \end{figure}
 
@@ -225,7 +225,7 @@ By recording the previous positions and waypoint locations the app generated, it
 \begin{figure}
   \centering
   \includegraphics[width=0.4\textwidth]{figures/test_env_picture.jpg}
-  \caption{A picture of the environment used for the experiments. Each QR code represents an object. OVERLAY GRID AND PRESENT EXAMPLE SEARCH}\label{fig:env-picture}
+  \caption{A picture of the environment used for the experiments. Each QR code represents an object.}\label{fig:env-picture}
 \end{figure}
 
 For each experiment, the participant was placed roughly \SI{1}{\meter} from the barcodes and was asked not to move from that spot during the experiment. The participant then pressed a button on the app that randomly selected a target object and was then guided towards that target by the app. Since the participants were allowed to use their vision, the targets were randomly selected and the participants were uninformed of what the target object was until it was found. This was done to avoid the participants learning the target objects' locations between each search run.
