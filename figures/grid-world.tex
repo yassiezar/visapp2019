@@ -1,0 +1,87 @@
+\tikzset{cross/.style={cross out, draw=black, minimum size=2*(#1-\pgflinewidth), inner sep=0pt, outer sep=0pt},cross/.default={1pt}}
+\begin{tikzpicture}%[background rectangle/.style={fill=yellow!20}, show background rectangle]
+
+  \def\thet{135}
+  \def\ph{45}
+  \def\l{2.2cm}
+  \coordinate (O) at (0,0);
+  \coordinate (U) at (3.5,-0.5);
+
+  \node[below] (user) at ($(U)+(0,-0.4)$) {User};
+  \draw[fill=black] (U) circle (0.3cm);
+
+  \node[above] (gridlabel) at (2.3, 7.2) {Grid-world};
+
+  % Draw the grid world outlines
+  \coordinate (s0) at (0,0);
+  \coordinate (s1) at (5,1);
+  \coordinate (s2) at (5,6);
+  \coordinate (s3) at (0,5);
+  \draw[name path=bot_curve] (s0) to[out=90, in=140] (s1);
+  \draw (s1) -- (s2);
+  \draw[name path=top_curve] (s2) to[out=140, in=90] (s3);
+  \draw (s3) -- (s0);% node[above right] {(0, 0)};
+
+  %Draw horizontal grid lines 
+  \draw[dashed] ($(s0)+(0,1)$) to[out=90, in=140] ($(s1)+(0,1)$);
+  \draw[dashed] ($(s0)+(0,2)$) to[out=90, in=140] ($(s1)+(0,2)$);
+  \draw[dashed] ($(s0)+(0,3)$) to[out=90, in=140] ($(s1)+(0,3)$);
+  \draw[dashed] ($(s0)+(0,4)$) to[out=90, in=140] ($(s1)+(0,4)$);
+  \draw[dashed] ($(s0)+(0,5)$) to[out=90, in=140] ($(s1)+(0,5)$);
+
+  % Draw vertical grid lines
+  \coordinate (v1) at ($(s0)!0.166!(s1)$);
+  \coordinate (v2) at ($(s0)!0.33!(s1)$);
+  \coordinate (v3) at ($(s0)!0.5!(s1)$);
+  \coordinate (v4) at ($(s0)!0.66!(s1)$);
+  \coordinate (v5) at ($(s0)!0.83!(s1)$);
+
+  \draw[draw=none,name path=vert1] (v1) -- ($(v1)+(0,7)$);
+  \draw[draw=none,name path=vert2] (v2) -- ($(v2)+(0,7)$);
+  \draw[draw=none,name path=vert3] (v3) -- ($(v3)+(0,7)$);
+  \draw[draw=none,name path=vert4] (v4) -- ($(v4)+(0,7)$);
+  \draw[draw=none,name path=vert5] (v5) -- ($(v5)+(0,7)$);
+  \coordinate[name intersections={of=bot_curve and vert1,by={int11}}];
+  \coordinate[name intersections={of=top_curve and vert1,by={int12}}];
+  \coordinate[name intersections={of=bot_curve and vert2,by={int21}}];
+  \coordinate[name intersections={of=top_curve and vert2,by={int22}}];
+  \coordinate[name intersections={of=bot_curve and vert3,by={int31}}];
+  \coordinate[name intersections={of=top_curve and vert3,by={int32}}];
+  \coordinate[name intersections={of=bot_curve and vert4,by={int41}}];
+  \coordinate[name intersections={of=top_curve and vert4,by={int42}}];
+  \coordinate[name intersections={of=bot_curve and vert5,by={int51}}];
+  \coordinate[name intersections={of=top_curve and vert5,by={int52}}];
+  \draw[dashed] (int11) -- (int12);
+  \draw[dashed] (int21) -- (int22);
+  \draw[dashed] (int31) -- (int32);
+  \draw[dashed] (int41) -- (int42);
+  \draw[dashed] (int51) -- (int52);
+  
+  % Draw user node and viewing angles
+  \coordinate (c) at ($(U)+({\l*cos(\thet)}, {\l*sin(\thet)})$);
+  \coordinate (cpan) at ($(c)+({-tan(\ph)*cos(\ph)}, {-tan(\ph)*sin(\ph)})$);
+  \coordinate (ctilt) at ($(c)+({tan(\ph)*sin(\ph)}, {tan(\ph)*cos(\ph)})$);
+
+  \draw[-Latex,] (U) -- coordinate (carc) (c) node[below] {C};
+  \draw[dashed,-Latex] (U) -- coordinate (cpanarc) (cpan);
+  \draw[dashed,-Latex] (U) -- coordinate (ctiltarc) (ctilt);
+
+  \draw[-Latex] (carc) to[out=190, in=80] (cpanarc) node[right, yshift=0.13cm] {$\phi$};
+  \draw[-Latex] (carc) to[out=80, in=190] (ctiltarc) node[below left] {$\theta$} ;
+
+  % Add objects
+  \coordinate (obj1) at ($(v1)!0.5!(v2) + (0,1.8)$);
+  \coordinate (obj2) at ($(v3)!0.5!(v4) + (0,3.7)$);
+  \coordinate (obj3) at ($(v2)!0.5!(v3) + (0,4.8)$);
+
+  \draw (obj1) node[cross=3pt,rotate=12] {};
+  \draw (obj2) node[cross=3pt,rotate=-3] {};
+  \draw (obj3) node[cross=3pt,rotate=4] {};
+
+  \node[left] (objectlabel) at (-0.4,2) {Objects};
+
+  \draw[->] (objectlabel) -- ($(obj1)+(-0.1,0)$);
+  \draw[->] (objectlabel) -- ($(obj2)+(-0.1,-0.1)$);
+  \draw[->] (objectlabel) -- ($(obj3)+(-0.1,-0.1)$);
+
+\end{tikzpicture}

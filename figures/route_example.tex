@@ -1,0 +1,22 @@
+\tikzset{cross/.style={cross out, draw=black, minimum size=2*(#1-\pgflinewidth), inner sep=0pt, outer sep=0pt},cross/.default={1pt}}
+\begin{tikzpicture}%[background rectangle/.style={fill=yellow!20}, show background rectangle]
+
+  \coordinate (s0) at (0,0);
+  \coordinate (s1) at (0,4);
+  \coordinate (s2) at (4,4);
+  \coordinate (s3) at (4,0);
+
+  \draw (s0) -- (s1) -- (s2) -- (s3) -- cycle;
+
+  \draw[dashed] ($(s0)!.25!(s1)$) -- ($(s2)!.75!(s3)$);
+  \draw[dashed] ($(s0)!.5!(s1)$) -- ($(s2)!.5!(s3)$);
+  \draw[dashed] ($(s0)!.75!(s1)$) -- ($(s2)!.25!(s3)$);
+
+  \draw[dashed] ($(s0)!.25!(s3)$) -- ($(s1)!.25!(s2)$);
+  \draw[dashed] ($(s0)!.5!(s3)$) -- ($(s1)!.5!(s2)$);
+  \draw[dashed] ($(s0)!.75!(s3)$) -- ($(s1)!.75!(s2)$);
+
+  \draw ($(s0)!0.125!(s1)+(s0)!0.125!(s3)$) node[cross=3pt,rotate=0] {};
+  \node[circle,draw=black] () at ($(s0)!0.875!(s1)+(s0)!0.625!(s3)$) {};
+
+\end{tikzpicture}
