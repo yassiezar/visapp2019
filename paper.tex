@@ -277,13 +277,11 @@ The participants were left to repeat this process until we recorded 10 searches 
 
 \subsection{Results}
 
-\noindent In order to evaluate our system, we identified 3 different measures: target acquisition rate (TAR), number of steps to the target and the total time it took to find a target object. We present and discuss the results for each of these parameters in the next sections. The results for each individual participant is presented in Table~\ref{tab:results-full} and Table~\ref{tab:results-summary} gives the results across all of the participants. 
-
-To provide a baseline measure for the ideal case, we ran a number of simulations in an environment mimicking the experiment setup with an agent that perfectly executes the policy, i.e.\ $u=u^*$. The TAR and steps to target results for the simulation are included in Table~\ref{tab:results-summary}.
+\noindent We identified 3 different measures to evaluate the system's performance: target acquisition rate (TAR), number of steps to the target and the total time it took to find a target object. We present and discuss the results for each of these parameters in the next sections. The results for each individual participant is presented in Table~\ref{tab:results-full} and Table~\ref{tab:results-summary} gives the results across all of the participants. To provide a baseline measure for the ideal case, we ran a number of simulations in an environment mimicking the experiment setup with an agent that perfectly executes the policy, i.e.\ $u=u^*$. The TAR and steps to target results for the simulation are included in Table~\ref{tab:results-summary}.
 
 \begin{table}
   \centering
-  \caption{A table containing the results for the TAR, number of steps and time to target means ($\mu$) and standard deviations ($\sigma$) for each individual participant.}\label{tab:results-full}
+  \caption{A table containing the results for the TAR, number of steps and time to target means ($\mu$) and standard deviations ($\sigma$) for each participant. }\label{tab:results-full}
   \begin{tabular}{cccc}
     \toprule
     Participant & TAR [\%] & Num. Steps & Time [s] \\ \midrule
@@ -305,7 +303,7 @@ To provide a baseline measure for the ideal case, we ran a number of simulations
                                    
 \begin{table}                      
   \centering                       
-  \caption{A table summarising the means ($\mu$) and standard deviations ($\sigma$) for the entire participant population for the experiment and simulation.}\label{tab:results-summary}
+  \caption{The means and standard deviations for the entire participant population for the experiments and simulations.}\label{tab:results-summary}
   \begin{tabular}{llc}
     \toprule
     \multirow{2}{*}{TAR [\%]} & Experiment & 82 $\pm$ 11  \\ 
@@ -319,9 +317,7 @@ To provide a baseline measure for the ideal case, we ran a number of simulations
 
 \subsubsection{Target Acquisition Rate}
 
-\noindent The TAR is a measure of how successful the system was at directing a participant to the target object within the 16-step limit we imposed and is simply calculated as a proportion of the number completed searches vs.\ the total number of searches. Please note, however, that this plot is dependant on the step-limit we selected and should not be taken as an absolute measure of performance, but is rather presented to provide context to the other results we present. 
-
-\uline{From Figure~\ref{fig:tar-steps} we can see that the TAR has a gradual increase as we vary the step limit. This appears to justify our choice of a 15-waypoint cut-off. However, the spiking tail should be considered.  }
+\noindent The TAR is a measure of how successful the system was at directing a participant to the target object within the 15-step limit we set and is simply calculated as a proportion of the number completed searches vs.\ the total number of searches. Please note, however, that this plot is dependant on the step-limit we selected and should not be taken as an absolute measure of performance, but is rather presented to provide context to the other results we present. Figure~\ref{fig:tar-steps} shows the TAR as a function of the step-limit and it shows that there is a gradual increase in the TAR as the step limit increases, but tapers off at higher step-limits. \uline{The angled tail at the 15-step limit is interesting to note, however. WHY}
 
 \begin{figure}
   \centering
@@ -337,20 +333,19 @@ To provide a baseline measure for the ideal case, we ran a number of simulations
 
 Table~\ref{tab:results-full} shows a fairly consistent spread for the TAR across the participants. The inter-participant spread ($\sigma=11\%$) is fairly significant, perhaps indicating that the user's search behaviour and strategy affects the target acquisition performance, but with an average TAR of $81.2\%$, it is clear that the system successfully finds the target object during the vast majority of searches. 
 
-Figure~\ref{fig:tar-objects} shows the TAR for each object in $\mathbf{O}$. From it, we can see that there are variations the TAR for the different objects, with the smaller objects typically being the hardest to find. However, the differences are not extreme and indicate that all the objects in $\mathbf{O}$ are roughly equally hard to find. This is also displayed in the simulation's TAR in Table~\ref{tab:results-summary}, which could not achieve 100\% because of the difficulty the agent had in finding the objects on the fringes of the environment. 
-
+Figure~\ref{fig:tar-objects} shows the TAR for each object in $\mathbf{O}$. There are variations the TAR for the different objects, with the smaller objects typically being the hardest to find. However, the differences are not extreme and indicate that all the objects in $\mathbf{O}$ are roughly equally hard to find. This is also displayed in the simulation's TAR in Table~\ref{tab:results-summary}, which could not achieve 100\% because of the difficulty the agent had in finding the objects on the fringes of the environment. 
 
 \begin{figure}
   \centering
   \includegraphics[width=0.45\textwidth]{figures/tar_objects.png}
-  \caption{The TAR for each of the objects within the target object set. }\label{fig:tar-objects}
+  \caption{The TAR for each of the objects within $\mathbf{O}$. }\label{fig:tar-objects}
 \end{figure}
 
-The TAR can be improved with regards to entering a no-recovery state where it directs a user into dead-space with no spatial information (e.g.\ a ceiling or wall section) and cannot gather the information it requires to intelligently guide the user. Subsequent system updates will have to consider implementing fall-back methods or other automatic recovery modes that can detect entry of a no-recovery state (e.g.\ exceeding a set number of steps/time without making an observation) and guide the user back to the initial position.
+Failure cases were typically caused by the system entering a no-recovery state where the system directed a user into dead-space with no spatial information (e.g.\ a ceiling or wall section) and could not gather the information it required to intelligently guide the user. Subsequent system updates will have to consider implementing fall-back methods or automatic recovery modes that can detect entry of a no-recovery state (e.g.\ exceeding a set number of steps/time without making an observation) and guide the user back to the initial position and restart a search.
 
 \subsubsection{Number of Steps to Target}
 
-\noindent The number of steps target indicates the number of waypoints the system generated for the participant during the guidance process and is a major indication of system performance, where less waypoints means faster target acquisition and better performance. Figure~\ref{fig:nsteps-participants} shows the cumulative distribution of the number of steps to the target for all the participants. 
+\noindent The number of steps to the target indicates the number of waypoints the system generated for the participant during the guidance process and is a major indication of system performance, where less waypoints means faster target acquisition and better performance. Figure~\ref{fig:nsteps-participants} shows the cumulative distribution of the number of steps to the target for all the participants. 
 
 \begin{figure}
   \centering
@@ -358,9 +353,9 @@ The TAR can be improved with regards to entering a no-recovery state where it di
   \caption{The cumulative distribution of the participants' number of steps taken to find a target object. }\label{fig:nsteps-participants}
 \end{figure}
 
-The number of waypoints each participant required is fairly evenly spread across all of the participants. The population mean and standard deviation is 6.8 and 5.1 waypoints respectively. This is a reasonable result that was also somewhat expected, since most target objects were placed within approximately 4 grid squares away from the participants' initial looking directions. However, the relatively high standard deviation should be noted and can also be reduced by implementing the automatic recovery mode mentioned previously, and avoiding information-sparse areas.
+The number of waypoints each participant required is fairly evenly spread across all of the participants, with the majority of searches ending at $n < 4 \land n > 13$. The population mean and standard deviation is 6.8 and 5.1 waypoints respectively. This is a reasonable result, since most target objects were placed within approximately 4 grid squares away from the participants' initial looking directions. However, the relatively high standard deviation should be noted and can also be reduced by implementing the automatic recovery mode mentioned previously, and avoiding information-sparse areas.
 
-As expected, the number of steps on the simulation required on average to find the target object is less than for the experiments. The full set of results for the simulation is given by a frequency mapping of the coincidences between the simulation and experimental data in Figure~\ref{fig:sim-vs-experiment}.
+As expected, the number of steps the simulation required on average to find the target object is less than the participants did during the experiments. The full set of results for the simulation is given by a frequency mapping of the coincidences between the simulation and experimental data in Figure~\ref{fig:sim-vs-experiment}.
 
 \begin{figure}
   \centering
@@ -382,9 +377,11 @@ As expected, the number of steps on the simulation required on average to find t
 
 In comparison to the VizWiz system~\cite{bigham2010vizwiz} (mean 92s, standard deviation 37.7s), our results look very reasonable. However, these results may greatly change when we test the system with VI participants like they did in~\cite{bigham2010vizwiz}.
 
+\uline{COMPARE RESULTS FROM ROBOTS? APPROX 100s FOR PLANNING AND EXECUTION}
+
 \section{\uppercase{Conclusions}}\label{sec:conclusion}
 
-\noindent In this work we presented and tested an MDP-based system to guide a visually impaired (VI) person towards a target object with no apriori knowledge of the environment. We implemented the system in an Android app that we tested with a small group of sighted people to determine its viability and effectiveness at guiding a user to manipulating a camera and finding a target object. We found that is works well when compared to alternative systems, with a respectable mean time of target acquisition of 32s. However, the system can be improved by refining the search strategy and implementing an automatic fail-state recovery system that will guide a user back to neutral position if a fail-state is entered (e.g.\ a blank section of wall). 
+\noindent In this work we presented and tested an MDP-based system to guide a visually impaired (VI) person towards a target object with no apriori knowledge of the environment. We implemented the system in an Android app that we tested with a small group of sighted people to determine its viability and effectiveness at guiding a user to manipulating a camera and finding a target object. We found that is works well when compared to alternative systems, with a respectable mean time of target acquisition of 32s. However, the system can be improved by refining the search strategy and implementing an automatic fail-state recovery system that will guide a user back to neutral position if a fail-state is entered (e.g.\ a blank section of wall). Furthermore, a different dataset, purpose-built for object spatial relations, will give the MDP a more accurate understanding of the world and an improved transition model.
 
 The next steps to this project will involve using the data recorded here to improve and refine the MDP model that provides the guidance. The model can also be expanded to include more objects and actions. However, an important consideration and expansion to the problem is to change the MDP to an Partially Observable MDP (POMDP) model that will bring the model more in line with reality by acknowledging that the objects are not perfectly observable and humans do not perfectly follow guidance instructions. This adjustment may be very important when we replace the QR code scanner with an object recognition that are typically more prone to making classification errors. Finally, the model can be adapted to use on-line learning techniques in order to further refine its transition model as the guidance system is used.  
 
