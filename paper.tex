@@ -31,7 +31,7 @@
 
 \begin{document}
 
-\title{Designing an Agent for an Active Guidance System for Object Search} 
+\title{Object Search with a Mobile Device for the Visually Impaired\\Using an Active Guidance System} 
 
 \author{
   \authorname{Anon McAnon{\sup{1}}}
@@ -41,9 +41,10 @@
 %\email{jlock@lincoln.ac.uk}
 }
 
-\keywords{Active vision, object search, vision impaired, Markov decision process}
+\keywords{Active vision, object search, vision impairment, Markov Decision Process}
 
-\abstract{In this work, we propose a Markov Decision Process-based system that generates guidance instructions for a user to find a target object in an unknown environment and forms part of an active vision indoor guidance system for the visually impaired. An initial implementation of this system was implemented in an Android app and a set of experiments were carried out with sighted participants to determine its effectiveness. We found that the system works reasonably well and compares well to similar systems. }
+\abstract{Nowadays, smartphones can be used to provide a multitude of services to assist people with visual impairments. The cameras embedded in these mobile devices, in particular, can be used for many useful tasks, including searching particular objects in unknown environments. Although previous research in computer vision has looked at ways to solve these tasks by processing the video frames of the mobile camera, very little work has been done in {\em actively} guiding the user towards specific point of interest that maximise the effectiveness of the underlying visual algorithms.
+In this paper, we propose a control algorithm based on a Markov Decision Process (MDP) that generates instructions, in real-time, to guide a user searching for a target object with a smartphone's camera. The solution is part of a more general active vision application for the visually impaired. An initial implementation of the system on an Android smartphone was experimentally evaluated with sighted participants to determine the performance of the control algorithm. The results show the effectiveness of our solution and its potential application to help the visually impaired find objects in unknown environments.}
 
 \onecolumn \maketitle \normalsize \vfill
 
@@ -381,13 +382,13 @@ As expected, the number of steps on the simulation required on average to find t
 
 In comparison to the VizWiz system~\cite{bigham2010vizwiz} (mean 92s, standard deviation 37.7s), our results look very reasonable. However, these results may greatly change when we test the system with VI participants like they did in~\cite{bigham2010vizwiz}.
 
-\section{\uppercase{Future Work and Conclusion}}\label{sec:conclusion}
+\section{\uppercase{Conclusions}}\label{sec:conclusion}
 
 \noindent In this work we presented and tested an MDP-based system to guide a visually impaired (VI) person towards a target object with no apriori knowledge of the environment. We implemented the system in an Android app that we tested with a small group of sighted people to determine its viability and effectiveness at guiding a user to manipulating a camera and finding a target object. We found that is works well when compared to alternative systems, with a respectable mean time of target acquisition of 32s. However, the system can be improved by refining the search strategy and implementing an automatic fail-state recovery system that will guide a user back to neutral position if a fail-state is entered (e.g.\ a blank section of wall). 
 
 The next steps to this project will involve using the data recorded here to improve and refine the MDP model that provides the guidance. The model can also be expanded to include more objects and actions. However, an important consideration and expansion to the problem is to change the MDP to an Partially Observable MDP (POMDP) model that will bring the model more in line with reality by acknowledging that the objects are not perfectly observable and humans do not perfectly follow guidance instructions. This adjustment may be very important when we replace the QR code scanner with an object recognition that are typically more prone to making classification errors. Finally, the model can be adapted to use on-line learning techniques in order to further refine its transition model as the guidance system is used.  
 
-\clearpage
+% \clearpage
 \bibliographystyle{apalike}
 \bibliography{bib}
 
