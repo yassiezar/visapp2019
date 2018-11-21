@@ -34,7 +34,7 @@
 \title{Designing an Agent for an Active Guidance System for Object Search} 
 
 \author{
-  \authorname{John Anon{\sup{1}}}
+  \authorname{Anon McAnon{\sup{1}}}
   \affiliation{\sup{1}Anon University of Anon, Anonville, Anonistan}
   \email{anon.anon@anon.com}
 %\affiliation{\sup{1}Lincoln Centre for Autonomous Systems (L-CAS), University of Lincoln, Lincoln, UK}
@@ -49,7 +49,7 @@
 
 \section{\uppercase{Introduction}}
 
-\noindent It is estimated that there are 440 million people worldwide that live with mild to severe visual impairments or total blindness~\cite{bourne2017magnitude} and significant effort is being made to enable these people to lead more normal and independent lives. Modern improvements to mobile computing power and image processing techniques have provided researchers with new and powerful tools to solve this problem. The ActiVis project aims to contribute to this effort by delivering an indoor navigation system targeted towards enabling blind and visually impaired (VI) users to safely navigate towards their desired destination or find an object in an unknown and dynamic environment with minimal user input. The proposed system implements ideas from the field of active vision, but places a human in the control loop, pictured in Figure~\ref{fig:control-loop}, instead of a electro-mechanical servo. %This project expands upon concepts originally proposed in~\cite{bellotto2013} and~\cite{lock2017portable}.
+\noindent It is estimated that there are 440 million people worldwide that live with mild to severe visual impairments or total blindness~\cite{bourne2017magnitude} and significant effort is being made to enable these people to lead more normal and independent lives. Modern improvements to mobile computing power and image processing techniques have provided researchers with new and powerful tools to solve this problem. The ActiVis project aims to contribute to this effort by delivering an indoor navigation system targeted towards enabling blind and visually impaired (VI) users to safely navigate towards their desired destination or find an object in an unknown and dynamic environment with minimal user input. The proposed system implements ideas from the field of active vision, but replaces the electro-mechanical servo used in a typical control loop, pictured in Figure~\ref{fig:control-loop}, with a human. %This project expands upon concepts originally proposed in~\cite{bellotto2013} and~\cite{lock2017portable}.
 
 The goal of the ActiVis system is to understand the user's surroundings and determine what the next best course of action is to reach the target location based on what is currently within view and what has been observed in the past. We trained a Markov Decision Process (MDP)~\cite{bellman1957markovian} to produce a so-called policy that defines the optimal action the agent (the guidance system in this case) takes when it finds itself within some state.  
 
@@ -87,15 +87,13 @@ In all, much research has been conducted on object recognition and guidance towa
 
 \section{\uppercase{Active Vision System}}\label{sec:system-design}
 
-\noindent The ActiVis project's goal is to deliver a stand-alone system that only requires a VI user's input for selecting a target object/destination and then guide the user to it. A complete system diagram is given is Figure~\ref{fig:control-loop} and consists of a number of elements.
-
-The system design loop is similar to that of a classical control problem where a controller generates a control signal that drives a component towards some reference point. In this case, the reference signal, $r$, is the object the user wishes to find which is achieved by placing the target object within the camera's view. Therefore, the goal of the control block, $K$, is to generate guidance instructions, $u$ to drive the user along a search path towards the target object. Since we place a human in the control loop and are not working with a electro-mechanical system, we have an extra block, $H$, that interprets $u$ and executes a physical action, $u^*$, that manipulates the sensor, $P$, that makes a new observation. The new observation is then fed back to the loop and the error signal, $e$, is updated accordingly.  
+\noindent The ActiVis project's goal is to deliver a stand-alone system that can guide a VI user to their destination with minimal user input or intervention. A complete system diagram is given is Figure~\ref{fig:control-loop}. The system design loop is similar to that of a classical control problem where a controller generates a control signal that drives a component towards some reference point. In this case, the reference signal, $r$, is the object the user wishes to find which is achieved by placing the target object within the camera's view. Therefore, the goal of the control block, $K$, is to generate guidance instructions, $u$ to drive the user along a search path towards the target object. Since we place a human in the control loop, we have an extra block, $H$, that interprets $u$ and executes a physical action, $u^*$, that manipulates the sensor, $P$, that makes a new object observation. The new observation is then fed back to the loop and the error signal, $e$, is updated accordingly.  
 
 This work focusses on implementing $K$ and there are 2 points of interest to implementing such a controller successfully. Firstly, $K$ must be environment-agnostic, meaning that it cannot be constrained to specific environment since objects are not necessarily placed in the same place in every environment. Secondly, the controller must be robust enough to handle a badly interpreted $u$ signal. The risk of that happening can be minimised by generating clear and simple signals to help ensure that $u^*$ closely tracks $u$. 
 
 \section{\uppercase{Human-control Module}}\label{sec:controller-design}
 
-\noindent The guidance system is built into an Android app and uses Android's ARCore\footnote{https://developers.google.com/ar/} API to track the device's pose. The system is designed with the goal of generating a path of waypoints for the user to follow, by pointing the device camera, that will lead the user to the target object. This path is generated one waypoint at a time by the system and is updated with every object observation the user makes after adjusting the camera. We modelled and solved the search problem using an Markov Decision Process (MDP) model. The details of the MDP model design and implementation are discussed in the sections below. %For this initial design, the system only works in the pan and tilt dimension and the depth dimension will be added after successful testing of this version of the guidance system.
+\noindent The guidance system is built into an Android app and uses Android's ARCore\footnote{https://developers.google.com/ar/} API to track the device's pose. The system is designed with the goal of generating a path of waypoints for the user to follow, by pointing the device camera, that will lead the user to the target object. This path is generated one waypoint at a time by the system and is updated with every object observation the user makes after adjusting the camera. We modelled and solved the search problem using an MDP model. The details of the model's design and implementation are discussed in the following sections. %For this initial design, the system only works in the pan and tilt dimension and the depth dimension will be added after successful testing of this version of the guidance system.
 
 %\subsection{Environment Model}\label{sec:env-design}
 
@@ -141,7 +139,7 @@ and the possible actions are
 \end{equation}
 %These actions were chosen to conform to the grid implementation and increase the tracking performance of $u^*$ w.r.t\@ $u$. 
 
-Consider the scene in Figure~\ref{fig:route-example} which contains a number of simple, distinct objects (the red boxes). The MDP's task is to direct the user to point the camera to the target object (the mug in the bottom-left of Figure~\ref{fig:route-example}). It does this by inferring the current state by sampling the object currently within the camera's view, and generates an action that leads the user to the target object. 
+Consider the scene in Figure~\ref{fig:route-example} which contains a number of simple, distinct objects (the red boxes). The MDP's task is to direct the user to point the camera to the target object (the mug in the bottom-left of Figure~\ref{fig:route-example}). It does this by inferring the current state by sampling the object currently within the camera's view, and generates an action that leads the user to the target object. The states are sampled and the actions are generated in discretised steps as the user moves the camera's view in the instructed direction. This discrete behaviour is similar to a waypoint navigation approach where the user goes from one waypoint to the next, until the user points the camera to target object. 
 
 \begin{figure}
   \centering
@@ -149,11 +147,9 @@ Consider the scene in Figure~\ref{fig:route-example} which contains a number of 
   \caption{An example of a guidance strategy the MDP generates. }\label{fig:route-example}
 \end{figure}
 
-The states are sampled and the actions are generated in discretised steps as the user moves the camera's view in the instructed direction. This discrete behaviour is similar to a waypoint navigation approach where the user goes from one waypoint to the next, until the user points the camera to target object. 
-
 \subsubsection{State Transition Probabilities}
 
-\noindent The state transition function, $\mathbf{T}$, defines the likelihood of the agent transitioning into state $s'$ from state $s$ when taking action $a$, i.e.\ the likelihood of moving to a new pan/tilt position and observing object $o$ after performing action $a$. Therefore, $\mathbf{T}$ represents the spatial relationships between the different objects in the environment model. Formally, the transition function is defined by
+\noindent The state transition function, $\mathbf{T}$, defines the probability of the agent transitioning into state $s'$ from state $s$ when taking action $a$, i.e.\ the likelihood of moving to a new pan/tilt position and observing object $o$ after performing action $a$. Therefore, $\mathbf{T}$ represents the spatial relationships between the different objects in the environment model. Formally, the transition function is defined by
 
 \begin{equation}
   t=\langle{}s, a, s'\rangle, t\in{}\mathbf{T}.
@@ -173,16 +169,15 @@ The goal of the agent is to maximise the cumulative reward it receives and is a 
 
 %The goal of the agent is to maximise its cumulative reward over time and these numbers are chosen such that they actively motivate the agent to reach the target, while hastening the process by slightly punishing it for each step it takes and increasing the punishment every time it re-explores a state and the longer it takes to reach the target. 
 
-
 \subsection{MDP Implementation}
 
 \subsubsection{Model Training}
 
 \noindent A policy that defines the optimal action for an agent to take for any given state is generated through a training process that involves letting the agent explore the entire state-space and iteratively improve its decision function, i.e.\ policy, in order to reach the target state in a way that maximises its cumulative reward. This method is called Q-learning and does not require a model of its environment during training. 
 
-For our system, the agent's target state is any state where $s = \langle{}o=o_{target}, n, v\rangle$. This gives a total of 18 terminal states (9$\times$2) per policy, since the target object can can be found at any point in the search or in a position that was previously explored by the agent and user. Each target object has its own unique policy file.
+The agent's target state is any state where $s = \langle{}o=o_{target}, n, v\rangle$. This gives a total of 14 terminal states (7$\times$2) per policy, since the target object can can be found at any point in the search or in a position that was previously explored by the agent and user. Each target object has its own unique policy file.
 
-The reward function was crafted by hand and the parameters were empirically selected. The function values can be found in Table~\ref{tab:rewards}. $R$ punishes the agent for every step it takes where it does not find the target object and the negative reward is increased if the agent is taking too long to find the target ($n > n_{\max}$) or when it wants to search in a site that has been searched already ($v = true$). Conversely, it gives a significant positive reward when the target object is found. 
+The reward function was crafted by hand and the parameters were empirically selected. The function values can be found in Table~\ref{tab:rewards}. $R$ punishes the agent for every step it takes where it does not find the target object and the negative reward is increased if the agent is taking too long to find the target ($n > n_{\max}$) or when it generates a waypoint in a location that it has generated a waypoint previously ($v = true$). Conversely, it gives a significant positive reward when the target object is found. 
 
 \begin{table}
   \centering
@@ -205,7 +200,7 @@ Currently there are 8 objects encoded into the system, including a `nothing' ins
   \end{aligned}
 \end{equation}
 
-The spatial relationships between the objects in $\mathbf{O}$ are extracted from the OpenImage dataset\footnote{https://storage.googleapis.com/openimages/web/index.html}~\cite{openimages} that consists of 1.74M images containing 14.6M manually drawn and labelled bounding boxes around objects (see Figure~\ref{fig:openimage-example} for an example) and is primarily aimed toward object recognition researchers to test their models on. The bounding boxes and object labels are used to extract the spatial relationships between the different objects in $\mathbf{O}$. Since the camera perspectives and absolute distances between the objects in the images are not given, we can only extract the relationships in the basic action terms specified in $\mathbf{A}$, e.g.\ we can only say that object 1 is above object 2, but not how far above. Our simple action-space and grid environment somewhat compensates for the dataset's lack of complexity. 
+The spatial relationships between the objects in $\mathbf{O}$ are extracted from the OpenImage dataset\footnote{https://storage.googleapis.com/openimages/web/index.html}~\cite{openimages} that consists of 1.74M images containing 14.6M manually drawn and labelled bounding boxes around objects (see Figure~\ref{fig:openimage-example} for an example) and is primarily aimed toward object recognition researchers to benchmark their models. The bounding boxes and object labels are used to extract the spatial relationships between the different objects in $\mathbf{O}$. Since the camera perspectives and absolute distances between the objects in the images are not given, we can only extract the relationships in the basic action terms specified in $\mathbf{A}$, e.g.\ we can only say that object 1 is above object 2, but not how far above. Our simple action-space and grid environment somewhat compensates for the dataset's lack of complexity. 
 
 \begin{figure}
   \centering
@@ -228,7 +223,7 @@ Figure~\ref{fig:obj-relationships} shows the spatial relationship between a subs
   \caption{Examples of the spatial relationships between the desk, keyboard and mouse objects. Each square corresponds to the probability of executing the action that square represent (top square for $UP$, etc.)}\label{fig:obj-relationships}
 \end{figure}
 
-We set the model to track a maximum of of 11 (inclusive) steps to the target, with 11 being the longest possible route on the grid (more details about the grid are in Section~\ref{sec:system-implementation}). A search can take longer than 11 steps, but the MDP considers anything greater than 9 steps as the maximum, which is convenient for keeping a manageable state-space and a simple reward function. The MDP therefore has a total of 144 reachable states ($n_{states}=8\times9\times2$).
+We set the model to track a maximum of of 11 (inclusive) steps to the target, with 11 being the longest possible route on the grid (more details about the grid are in Section~\ref{sec:system-implementation}). A search can take longer than 11 steps, but the MDP considers anything greater than 9 steps as the maximum, which is convenient for keeping a manageable state-space and a simple reward function. The MDP therefore has a total of 154 reachable states ($s_{total}=11\times7\times2$).
 
 The lack of absolute spatial information in the OpenImage dataset generates ambiguities which makes it hard for the model to converge to a single, optimal solution. We therefore could not use the popular value iteration algorithm~\cite{bellman1957markovian} and opted for the state-action-reward-state-action (SARSA) algorithm~\cite{rummery1994line} instead. SARSA is an on-policy algorithm that allows us to control the level of exploration vs.\ exploitation that makes it easier to find a solution, but this solution is not guaranteed to be optimal. 
 
@@ -364,7 +359,7 @@ The TAR can be improved with regards to entering a no-recovery state where it di
 
 The number of waypoints each participant required is fairly evenly spread across all of the participants. The population mean and standard deviation is 6.8 and 5.1 waypoints respectively. This is a reasonable result that was also somewhat expected, since most target objects were placed within approximately 4 grid squares away from the participants' initial looking directions. However, the relatively high standard deviation should be noted and can also be reduced by implementing the automatic recovery mode mentioned previously, and avoiding information-sparse areas.
 
-As expected, the number of steps on the simulation required on average to find the target object is less than for the experiments. The full set of results for the simulation is given in Figure~\ref{fig:sim-vs-experiment} which plots the number of coincidences between the simulation and experiment results.
+As expected, the number of steps on the simulation required on average to find the target object is less than for the experiments. The full set of results for the simulation is given by a frequency mapping of the coincidences between the simulation and experimental data in Figure~\ref{fig:sim-vs-experiment}.
 
 \begin{figure}
   \centering
