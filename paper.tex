@@ -49,11 +49,9 @@
 
 \section{\uppercase{Introduction}}
 
-\noindent It is estimated that there are 440 million people worldwide that live with mild to severe visual impairments or total blindness~\cite{bourne2017magnitude} and significant effort is being made to enable sufferers to lead more normal and independent lives. Modern improvements to mobile computing and image processing techniques have provided researchers with new and exciting tools to solve this problem.
+\noindent It is estimated that there are 440 million people worldwide that live with mild to severe visual impairments or total blindness~\cite{bourne2017magnitude} and significant effort is being made to enable these people to lead more normal and independent lives. Modern improvements to mobile computing power and image processing techniques have provided researchers with new and powerful tools to solve this problem. The ActiVis project aims to contribute to this effort by delivering an indoor navigation system targeted towards enabling blind and visually impaired (VI) users to safely navigate towards their desired destination or find an object in an unknown and dynamic environment with minimal user input. The proposed system implements ideas from the field of active vision, but places a human in the control loop, pictured in Figure~\ref{fig:control-loop}, instead of a electro-mechanical servo. %This project expands upon concepts originally proposed in~\cite{bellotto2013} and~\cite{lock2017portable}.
 
-The ActiVis project will contribute to this effort by delivering an indoor navigation system targeted towards enabling blind and visually impaired (VI) users to safely navigate towards their desired destination or find an object in an unknown and dynamic environment with minimal user input. The proposed system implements ideas from the field of active vision, but places a human in the control loop, pictured in Figure~\ref{fig:control-loop} instead of a electro-mechanical servo. This project expands upon concepts originally proposed in~\cite{bellotto2013} and~\cite{lock2017portable}.
-
-The goal of ActiVis is to understand the user's surroundings and determine what the next best course of action is to reach the target location based on what the it is currently seeing and what it has seen in the past. We used a Markov Decision Process (MDP)~\cite{bellman1957markovian} to produce a so-called policy that defines the optimal action our agent (the guidance system in this case) takes when it finds itself in any state.  
+The goal of the ActiVis system is to understand the user's surroundings and determine what the next best course of action is to reach the target location based on what is currently within view and what has been observed in the past. We trained a Markov Decision Process (MDP)~\cite{bellman1957markovian} to produce a so-called policy that defines the optimal action the agent (the guidance system in this case) takes when it finds itself within some state.  
 
 \begin{figure}
   \centering
@@ -65,8 +63,8 @@ This work's contributions are
 
 \begin{itemize}
   \item a policy-driven human controller that can drive a user towards a point in space,
-  \item an MDP model that understands the spatial relationship between objects that is based on real data and
-  \item experiments that prove the effectiveness of the current system implementation.
+  \item a data-based MDP model that understands the spatial relationship between objects and
+  \item experiments that prove the effectiveness of the system implementation.
 \end{itemize}
 
 %is the design of a guidance system and MDP (the control-block, $K$, pictured in Figure~\ref{fig:control-loop}) that can drive a user to point a mobile device's camera towards a given point in space in and find a target object. We also present and discuss preliminary experimental results to show how effective the system is at finding a target. This guidance system will be implemented into the ActiVis project upon successful tests. 
@@ -79,11 +77,17 @@ Section~\ref{sec:previous-work} discusses other relevant work done in this field
 
 Another approach is to discard tags completely and rely on computer vision to perform the object detection, something that has become more plausible with recent improvements to feature detectors and deep networks~\cite{huang2017speed,redmon2016you}. The system described~\cite{schauerte2012assistive} uses a combination of SIFT and SURF to detect known objects when they are in the camera's view and guide the user to them using sonified guidance instructions. This system is more flexible than the tag-based ones, but have the same drawback of being passive and rely on chance for the user to place the object within the camera's view in the first place. The paper also does not report on any performance metrics. In~\cite{bigham2010vizwiz}, the authors discuss their VizWiz system that offloads the object recognition tasks to an Amazon Mechanical Turk worker that then provides feedback on where the object of interest is located relative to the user. The VizWiz has the advantage of being fairly robust and is able to classify a great deal of objects with little effort from the user and can provide natural, human-generated and curated directions. However, this approach does not address the issue of enhancing user independence, since the user is now beholden to an online worker instead of a relative, friend or bystander. Furthermore, a good internet connection is required on the device, perhaps limiting use in some poor-reception areas.
 
-As shown here, much research has been performed on object recognition and guidance towards an object once detected. However, work on active object search is harder to come by. Therefore, in this work we attempt to implement an active vision~\cite{aloimonos1988active,bellotto2013,lock2017portable} that can guide a user towards an out-of-view target object by using prior knowledge of the spatial distribution of objects within an indoor environment and the history of past object observations made during the search. With this, we hope to make the searching process less random and move towards a more natural search object searching process to the benefit of the VI\@.  
+Researchers have begun implementing active search and perception~\cite{aloimonos2013active} strategies in robots (CITE) and image classifiers (CITE) in an attempt to optimise their classification and planning tasks by exploiting the structured nature of human object placements. 
+
+In (CITE CLASSIFIER), the authors implemented an active search strategy for classifying objects within cluttered images. Their approaches use different methods, but both involve using a model to generate windows of interest to submit to a classifier for classification. The size and locations of the windows within the image are generated using the spatial relationship between objects, taken from the SUNCG and PASCAL datasets, and are iteratively changed based on the output from the respective models. The advantage of their approaches over their contemporaries is that far fewer windows are generated and submitted to the classifier, resulting in lower object classification times. They also report comparable accuracy when compared to their contemporaries. 
+
+Similarly, roboticists have moved to incorporate similar strategies on robotic platforms to improve autonomous object search, manipulation and localisation tasks. The authors in (CITE A* PAPER) developed a planning algorithm that allows a robotic manipulator to select an object to move that optimally executes an object search or exploration task in a cluttered environment. In (CITE MDP ROBOT), the authors implemented an MDP that generates the optimal search strategy to find an object in a room over a belief state of object positions and configurations. However, the authors trained their MDP using a custom object-placement and configuration probabilities and have shown that the results are sensitive to changes within this distribution. 
+
+In all, much research has been conducted on object recognition and guidance towards an object once detected, as well as active vision within image classifiers and robotic systems. However, work on active object search and guidance with a human is harder to come by. In this work we attempt to implement an active vision guidance system with a human in the loop~\cite{bellotto2013,lock2017portable} that can guide a user towards an out-of-view target object by using prior knowledge of the spatial distribution of objects within an indoor environment and the history of past object observations made during the search. With this, we hope to make the searching process less random and move towards a more natural and efficient object searching process to the benefit of the VI\@.  
 
 \section{\uppercase{Active Vision System}}\label{sec:system-design}
 
-\noindent The ActiVis project's goal is to deliver a stand-alone system that only requires a VI user's input for selecting a target object\textbackslash{}destination and then guide the user to it. A complete system diagram is given is Figure~\ref{fig:control-loop} and consists of a number of elements.
+\noindent The ActiVis project's goal is to deliver a stand-alone system that only requires a VI user's input for selecting a target object/destination and then guide the user to it. A complete system diagram is given is Figure~\ref{fig:control-loop} and consists of a number of elements.
 
 The system design loop is similar to that of a classical control problem where a controller generates a control signal that drives a component towards some reference point. In this case, the reference signal, $r$, is the object the user wishes to find which is achieved by placing the target object within the camera's view. Therefore, the goal of the control block, $K$, is to generate guidance instructions, $u$ to drive the user along a search path towards the target object. Since we place a human in the control loop and are not working with a electro-mechanical system, we have an extra block, $H$, that interprets $u$ and executes a physical action, $u^*$, that manipulates the sensor, $P$, that makes a new observation. The new observation is then fed back to the loop and the error signal, $e$, is updated accordingly.  
 
@@ -142,7 +146,7 @@ Consider the scene in Figure~\ref{fig:route-example} which contains a number of 
 \begin{figure}
   \centering
   \includegraphics[width=0.5\textwidth]{figures/office_desk_example.png}
-  \caption{An example of a guidance strategy the MDP will generate. }\label{fig:route-example}
+  \caption{An example of a guidance strategy the MDP generates. }\label{fig:route-example}
 \end{figure}
 
 The states are sampled and the actions are generated in discretised steps as the user moves the camera's view in the instructed direction. This discrete behaviour is similar to a waypoint navigation approach where the user goes from one waypoint to the next, until the user points the camera to target object. 
@@ -178,7 +182,7 @@ The goal of the agent is to maximise the cumulative reward it receives and is a 
 
 For our system, the agent's target state is any state where $s = \langle{}o=o_{target}, n, v\rangle$. This gives a total of 18 terminal states (9$\times$2) per policy, since the target object can can be found at any point in the search or in a position that was previously explored by the agent and user. Each target object has its own unique policy file.
 
-The reward function was crafted by hand and the parameters were empirically selected. The function values can be found in Table~\ref{tab:rewards}. $R$ punishes the agent for every step it takes where it does not find the target object and the negative reward is increased if the agent is taking too long to find the target ($n > n_{max}$) or when it wants to search in a site that has been searched already ($v = true$). Conversely, it gives a significant positive reward when the target object is found. 
+The reward function was crafted by hand and the parameters were empirically selected. The function values can be found in Table~\ref{tab:rewards}. $R$ punishes the agent for every step it takes where it does not find the target object and the negative reward is increased if the agent is taking too long to find the target ($n > n_{\max}$) or when it wants to search in a site that has been searched already ($v = true$). Conversely, it gives a significant positive reward when the target object is found. 
 
 \begin{table}
   \centering
@@ -186,7 +190,7 @@ The reward function was crafted by hand and the parameters were empirically sele
   \begin{tabular}{ll}
     \toprule
     $r(s, s'), s\in\mathbf{S}$ & -1  \\ \midrule
-    $r(n >= n_{max})$ & -10 \\ \midrule
+    $r(n > n_{\max})$ & -10 \\ \midrule
     $r(v = true)$  & -10 \\ \midrule
     $r(o = o_{target})$ & 10000 \\ \midrule
     \bottomrule
@@ -224,7 +228,7 @@ Figure~\ref{fig:obj-relationships} shows the spatial relationship between a subs
   \caption{Examples of the spatial relationships between the desk, keyboard and mouse objects. Each square corresponds to the probability of executing the action that square represent (top square for $UP$, etc.)}\label{fig:obj-relationships}
 \end{figure}
 
-We set the model to track a maximum of of 9 steps to the target, with 9 being the longest possible route on the grid (more details about the grid are in Section~\ref{sec:system-implementation}). A search can take longer than 9 steps, but the MDP considers anything greater than 9 steps as the maximum, which is convenient for keeping a manageable state-space and a simple reward function. The MDP therefore has a total of 144 reachable states ($n_{states}=8\times9\times2$).
+We set the model to track a maximum of of 11 (inclusive) steps to the target, with 11 being the longest possible route on the grid (more details about the grid are in Section~\ref{sec:system-implementation}). A search can take longer than 11 steps, but the MDP considers anything greater than 9 steps as the maximum, which is convenient for keeping a manageable state-space and a simple reward function. The MDP therefore has a total of 144 reachable states ($n_{states}=8\times9\times2$).
 
 The lack of absolute spatial information in the OpenImage dataset generates ambiguities which makes it hard for the model to converge to a single, optimal solution. We therefore could not use the popular value iteration algorithm~\cite{bellman1957markovian} and opted for the state-action-reward-state-action (SARSA) algorithm~\cite{rummery1994line} instead. SARSA is an on-policy algorithm that allows us to control the level of exploration vs.\ exploitation that makes it easier to find a solution, but this solution is not guaranteed to be optimal. 
 
@@ -284,26 +288,27 @@ To provide a baseline measure for the ideal case, we ran a number of simulations
 \begin{table}
   \centering
   \caption{A table containing the results for the TAR, number of steps and time to target means ($\mu$) and standard deviations ($\sigma$) for each individual participant.}\label{tab:results-full}
-  \begin{tabular}{cc|cc|cc}
+  \begin{tabular}{cccc}
     \toprule
-    \multirow{2}{*}{Participant} & \multirow{2}{*}{TAR [\%]} & \multicolumn{2}{c|}{Num. Steps} & \multicolumn{2}{c}{Time [s]} \\ 
-				 &			     & $\mu$ & $\sigma$		       & $\mu$ & $\sigma$  \\ \midrule
-    s1 & 94 & 7.2 & 5.4 & 29 & 22 \\ \midrule
-    s2 & 79 & 6.7 & 4.8 & 34 & 5.1 \\ \midrule
-    s3 & 91 & 6.3 & 4.9 & 31 & 21 \\ \midrule
-    s4 & 79 & 6.7 & 4.3 & 37 & 5.6 \\ \midrule
-    s5 & 76 & 7.2 & 4.9 & 33 & 14 \\ \midrule
-    s6 & 60 & 8.2 & 5.4 & 24 & 10 \\ \midrule
-    s7 & 86 & 8.5 & 5.8 & 31 & 16 \\ \midrule
-    s8 & 88 & 5.1 & 4.0 & 39 & 21 \\ \midrule
-    s9 & 98 & 7.2 & 5.4 & 39 & 18 \\ \midrule
-    s10 & 67 & 6.6 & 5.4 & 26 & 12 \\ \midrule\midrule
-    \bottomrule
-  \end{tabular}
-\end{table}
-
-\begin{table}
-  \centering
+    Participant & TAR [\%] & Num. Steps & Time [s] \\ \midrule
+    %\multirow{2}{*}{Participant} & \multirow{2}{*}{TAR [\%]} & \multicolumn{2}{c|}{Num. Steps} & \multicolumn{2}{c}{Time [s]} \\ 
+				 %&			     & $\mu$ & $\sigma$		       & $\mu$ & $\sigma$  \\ \midrule
+    s1 & 94 & 7.2 $\pm$ 5.4 & 29 $\pm$ 22 \\ \midrule
+    s2 & 79 & 6.7 $\pm$ 4.8 & 34 $\pm$ 5.1 \\ \midrule
+    s3 & 91 & 6.3 $\pm$ 4.9 & 31 $\pm$ 21 \\ \midrule
+    s4 & 79 & 6.7 $\pm$ 4.3 & 37 $\pm$ 5.6 \\ \midrule
+    s5 & 76 & 7.2 $\pm$ 4.9 & 33 $\pm$ 14 \\ \midrule
+    s6 & 60 & 8.2 $\pm$ 5.4 & 24 $\pm$ 10 \\ \midrule
+    s7 & 86 & 8.5 $\pm$ 5.8 & 31 $\pm$ 16 \\ \midrule
+    s8 & 88 & 5.1 $\pm$ 4.0 & 39 $\pm$ 21 \\ \midrule
+    s9 & 98 & 7.2 $\pm$ 5.4 & 39 $\pm$ 18 \\ \midrule
+    s10 & 67 & 6.6 $\pm$ 5.4 & 26 $\pm$ 12 \\ \midrule
+    \bottomrule                    
+  \end{tabular}                    
+\end{table}                        
+                                   
+\begin{table}                      
+  \centering                       
   \caption{A table summarising the means ($\mu$) and standard deviations ($\sigma$) for the entire participant population for the experiment and simulation.}\label{tab:results-summary}
   \begin{tabular}{llc}
     \toprule
