@@ -56,8 +56,16 @@ The goal of the ActiVis system is to understand the user's surroundings and dete
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.45\textwidth]{figures/control_loop.png}
-  \caption{The ActVis system layout and control loop. }\label{fig:control-loop}
+  \begin{subfigure}
+    \centering
+    \includegraphics[width=0.38\textwidth]{figures/system_use.png}
+    \caption{The ActiVis system in use during an experiment. }\label{fig:system-use}
+  \end{subfigure}
+  \begin{subfigure}
+    \centering
+    \includegraphics[width=0.45\textwidth]{figures/control_loop.png}
+    \caption{The ActVis system layout and control loop. }\label{fig:control-loop}
+  \end{subfigure}
 \end{figure}
 
 This work's contributions are 
@@ -183,7 +191,7 @@ The reward function was crafted by hand and the parameters were empirically sele
 \begin{table}
   \centering
   \caption{The reward functions for the MDP.\ }\label{tab:rewards}
-  \begin{tabular}{ll}
+  \begin{tabular}{cc}
     \toprule
     $r(s, s'), s\in\mathbf{S}$ & -1  \\ \midrule
     $r(n > n_{\max})$ & -10 \\ \midrule
@@ -304,7 +312,7 @@ The participants were left to repeat this process until we recorded 10 searches 
 \begin{table}                      
   \centering                       
   \caption{The means and standard deviations for the entire participant population for the experiments and simulations.}\label{tab:results-summary}
-  \begin{tabular}{llc}
+  \begin{tabular}{ccc}
     \toprule
     \multirow{2}{*}{TAR [\%]} & Experiment & 82 $\pm$ 11  \\ 
 			      & Simulation & 99.7 \\ \midrule
