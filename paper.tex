@@ -33,9 +33,6 @@
 
 \newcommand{\todo}[1]{\textcolor{red}{[#1]}}
 
-
-
-
 \begin{document}
 
 \title{Active Object Search with a Mobile Device for the Visually Impaired} 
@@ -93,13 +90,13 @@ Section~\ref{sec:previous-work} discusses other relevant work done in this field
 
 \noindent Assistive vision and guidance for the VI is an active and diverse field of study. In recent years, the increase in mobile processing power and computer vision improvements have led to researchers investigating using a cellphone camera to augment or enhance a user's vision and help them find objects or another point of interest. Earlier attempts at the problem involved placing special markers or barcodes, encoded with information about an object or the area, around an environment, which the user then scans with a cellphone or similar mobile device~\cite{gude2013blind,iannizzotto2005badge3d,manduchi2012mobile}. This device then uses some feedback mode, e.g.\ Braille and sound, to guide the user towards the target. %The major drawbacks to this approach is the significant upfront effort required to augment entire areas with markers to a point where the system will be useful to a VI user. Furthermore, these passive systems rely on the user scanning the marker in the first place; something that can be made more complicated with markers degrading over time, changing ambient lighting, different viewing angles and marker occlusion. 
 
-Another approach is to discard tags completely and rely on computer vision to perform the object detection, something that has become more plausible with recent improvements to feature detectors and deep networks~\cite{huang2017speed,redmon2016you}. The system described~\cite{schauerte2012assistive} uses a combination of SIFT and SURF to detect known objects when they are in the camera's view and guide the user to them using sonified guidance instructions. This system is more flexible than the tag-based ones, but have the same drawback of being passive and rely on chance for the user to place the object within the camera's view in the first place. The paper also does not report on any performance metrics. In~\cite{bigham2010vizwiz}, the authors discuss their VizWiz system that offloads the object recognition tasks to an Amazon Mechanical Turk worker that then provides feedback on where the object of interest is located relative to the user. The VizWiz has the advantage of being fairly robust and is able to classify a great deal of objects with little effort from the user and can provide natural, human-generated and curated directions. However, this approach does not address the issue of enhancing user independence, since the user is now beholden to an online worker instead of a relative, friend or bystander. Furthermore, a good internet connection is required on the device, perhaps limiting use in some poor-reception areas.
+Another approach is to discard tags completely and rely on computer vision to perform the object detection, something that has become more plausible with recent improvements to feature detectors and deep networks~\cite{huang2017speed,redmon2016you}. SIFT and SURF-based object detectors have also been used to detect known objects when they are in the camera's view and guide the user to them using sonified guidance instructions~\cite{schauerte2012assistive}. This system is more flexible than the tag-based ones, but have the same drawback of being passive and rely on chance for the user to place the object within the camera's view in the first place. The paper also does not report on any performance metrics. The VizWize system~\cite{bigham2010vizwiz} offloads the object recognition tasks to an Amazon Mechanical Turk worker that then provides feedback on where the object of interest is located relative to the user. The VizWiz has the advantage of being fairly robust and is able to classify a great deal of objects with little effort from the user and can provide natural, human-generated and curated directions. However, this approach does not address the issue of enhancing user independence, since the user is now beholden to an online worker instead of a relative, friend or bystander. Furthermore, a good internet connection is required on the device, perhaps limiting use in some poor-reception areas.
 
 Researchers implemented active search and perception~\cite{Bajcsy2017} strategies in robots and image classifiers in an attempt to optimise their classification and planning tasks by exploiting the structured nature of human object placements. 
 
-In~\cite{caicedo2015active,gonzalez2015active}, the authors implemented an active search strategy for classifying objects within cluttered images. Their approaches use different methods, but both involve using a model to generate windows of interest to submit to a classifier for classification. The size and locations of the windows within the image are generated using the spatial relationship between objects, taken from the SUNCG and PASCAL datasets, and are iteratively changed based on the output from the respective models. The advantage of their approaches over their contemporaries is that far fewer windows are generated and submitted to the classifier, resulting in lower object classification times. They also report comparable accuracy when compared to their contemporaries. 
+Two research teams have recently implemented an active object search strategy into their image classifiers~\cite{caicedo2015active,gonzalez2015active}. Their approaches use different methods, but both involve using a model to generate windows of interest to submit to a classifier for classification. The size and locations of the windows within the image are generated using the spatial relationship between objects, taken from the SUNCG and PASCAL datasets, and are iteratively changed based on the output from the respective models. The advantage of their approaches over their contemporaries is that far fewer windows are generated and submitted to the classifier, resulting in lower object classification times. They also report comparable accuracy compared to their counterparts. 
 
-Similarly, roboticists have moved to incorporate similar strategies on robotic platforms to improve autonomous object search, manipulation and localisation tasks. The authors in~\cite{dogar2014object} developed a planning algorithm that allows a robotic manipulator to select an object to move that optimally executes an object search or exploration task in a cluttered environment. In~\cite{aydemir2011search}, the authors implemented an MDP that generates the optimal search strategy to find an object in a room over a belief state of object positions and configurations. However, the authors trained their MDP using a custom object-placement and configuration probabilities and have shown that the results are sensitive to changes within this distribution. 
+Similarly, roboticists have moved to incorporate similar strategies on robotic platforms to improve autonomous object search, manipulation and localisation tasks. Researchers have developed a planning algorithm that allows a robotic manipulator to select an object to move that optimally executes an object search or exploration task in a cluttered environment~\cite{dogar2014object}. Another team implemented an MDP that generates the optimal search strategy to find an object in a room over a belief state of object positions and configurations~\cite{aydemir2011search}. However, the authors trained their MDP using a custom object-placement and configuration probabilities and have shown that the results are sensitive to changes within this distribution. 
 
 In all, much research has been conducted on object recognition and guidance towards an object once detected, as well as active vision within image classifiers and robotic systems. However, work on active object search and guidance with a human is harder to come by. In this work we attempt to implement an active vision guidance system with a human in the loop~\cite{bellotto2013,lock2017portable} that can guide a user towards an out-of-view target object by using prior knowledge of the spatial distribution of objects within an indoor environment and the history of past object observations made during the search. With this, we hope to make the searching process less random and move towards a more natural and efficient object searching process to the benefit of the VI\@.  
 
@@ -245,10 +242,10 @@ We set the model to track a maximum of of 11 (inclusive) steps to the target, wi
 
 The lack of absolute spatial information in the OpenImage dataset generates ambiguities which makes it hard for the model to converge to a single, optimal solution. We therefore could not use the popular value iteration algorithm~\cite{bellman1957markovian} and opted for the state-action-reward-state-action (SARSA) algorithm~\cite{rummery1994line} instead. SARSA is an on-policy algorithm that allows us to control the level of exploration vs.\ exploitation that makes it easier to find a solution, but this solution is not guaranteed to be optimal. 
 
-The model is trained until it converges to the optimal policy, or for a total of approximately 17 million episodes. The parameter, $\alpha$, that controls the exploration vs.\ exploitation behaviour during training maximises exploration when it is set to $1.0$ and exploitation when it is $0.0$. We set $\alpha$ to a function that starts at a high exploration value and exponentially changes it behaviour to exploitation as it becomes more trained. $\alpha$ is given by 
+The model is trained until it converges to the optimal policy, or for a total of approximately 17 million episodes. The parameter, $\alpha$, that controls the exploration vs.\ exploitation behaviour during training maximises exploration when it is set to $1$ and exploitation when it is $0$. We set $\alpha$ to a function that starts at a high exploration value and exponentially changes it behaviour to exploitation as it becomes more trained. $\alpha$ is given by 
 
 \begin{equation}
-  \alpha = \exp\Big(\frac{-i}{10n_{states}}\Big) - 0.001,
+  \alpha = \exp\Big(\frac{-i}{10s_{total}}\Big) - 0.001,
 \end{equation}
 where $i$ is the episode index.  $\gamma$ is set to 0.95 to prioritise long-term reward. 
 
@@ -270,7 +267,7 @@ By recording the previous positions and waypoint locations the app generated, it
 
 The QR code scanner requires raw image data. To avoid scanning multiple QR codes and using excess processing power by scanning large images, we only used the centre part of the screen to scan for a barcode. This scanner area is $300\times300$ pixels and scans for barcodes without causing any frame-rate drops.  
 
-The app was developed on and experimented with an Asus ZenPhone AR\footnote{asus.com/uk/Phone/ZenFone-AR-ZS571KL/} running Android version 7.0 with the ARCore\footnote{https://developers.google.com/ar/} SDK enabled. No hardware or software modifications were required.
+The app was developed on and experimented with an Asus ZenPhone AR\todo{No footers}\footnote{asus.com/uk/Phone/ZenFone-AR-ZS571KL/} running Android version 7.0 with the ARCore\footnote{https://developers.google.com/ar/} SDK enabled. No hardware or software modifications were required.
 
 \section{\uppercase{Experiments}}\label{sec:experiments}
 
@@ -334,7 +331,7 @@ The participants were left to repeat this process until we recorded 10 searches 
 
 \subsubsection{Target Acquisition Rate}
 
-\noindent The TAR is a measure of how successful the system was at directing a participant to the target object within the 15-step limit we set and is simply calculated as a proportion of the number completed searches vs.\ the total number of searches. Please note, however, that this plot is dependant on the step-limit we selected and should not be taken as an absolute measure of performance, but is rather presented to provide context to the other results we present. Figure~\ref{fig:tar-steps} shows the TAR as a function of the step-limit and it shows that there is a gradual increase in the TAR as the step limit increases, but tapers off at higher step-limits. \uline{The angled tail at the 15-step limit is interesting to note, however. WHY}
+\noindent The TAR is a measure of how successful the system was at directing a participant to the target object within the 15-step limit we set and is simply calculated as a proportion of the number completed searches vs.\ the total number of searches. Please note, however, that this plot is dependant on the step-limit we selected and should not be taken as an absolute measure of performance, but is rather presented to provide context to the other results we present. Figure~\ref{fig:tar-steps} shows the TAR as a function of the step-limit and it shows that there is a gradual increase in the TAR as the step limit increases, but tapers off at higher step-limits. The angled tail at the 15-step limit is interesting to note, however. \todo{WHY}
 
 \begin{figure}
   \centering
@@ -394,7 +391,7 @@ As expected, the number of steps the simulation required on average to find the 
 
 In comparison to the VizWiz system~\cite{bigham2010vizwiz} (mean 92s, standard deviation 37.7s), our results look very reasonable. However, these results may greatly change when we test the system with VI participants like they did in~\cite{bigham2010vizwiz}.
 
-\uline{COMPARE RESULTS FROM ROBOTS? APPROX 100s FOR PLANNING AND EXECUTION}
+\todo{COMPARE RESULTS FROM ROBOTS? APPROX 100s FOR PLANNING AND EXECUTION}
 
 \section{\uppercase{Conclusions}}\label{sec:conclusion}
 
@@ -404,6 +401,7 @@ The next steps to this project will involve using the data recorded here to impr
 
 % \clearpage
 \bibliographystyle{apalike}
-\bibliography{bib}
+{\small
+\bibliography{bib}}
 
 \end{document}
