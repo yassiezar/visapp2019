@@ -111,8 +111,8 @@ This work focusses on implementing $K$ and there are 2 points of interest to imp
 
 \section{\uppercase{Human-control Module}}\label{sec:controller-design}
 
-\noindent The guidance system is built into an Android app and uses Android's ARCore\footnote{https://developers.google.com/ar/} API to track the device's pose. The system is designed with the goal of generating a path of waypoints for the user to follow, by pointing the device camera, that will lead the user to the target object. This path is generated one waypoint at a time by the system and is updated with every object observation the user makes after adjusting the camera. We modelled and solved the search problem using an MDP model. The details of the model's design and implementation are discussed in the following sections. %For this initial design, the system only works in the pan and tilt dimension and the depth dimension will be added after successful testing of this version of the guidance system.
-
+\noindent The system guides a user by generating a set of waypoints to indicate an area for the user to investigate with the camera and will lead the user to the target object. This path is generated one waypoint at a time by the system and is updated with every object observation the user makes after adjusting the camera. We modelled the problem using an MDP and the details of the model's design and implementation are discussed in the following sections. %For this initial design, the system only works in the pan and tilt dimension and the depth dimension will be added after successful testing of this version of the guidance system.
+ %The guidance system is built into an Android app and uses Android's ARCore API to track the device's pose. 
 %\subsection{Environment Model}\label{sec:env-design}
 
 %\noindent We model this problem on the familiar grid-world problem, where an agent is tasked move to a terminal square from an origin square given some constraints. However, instead of the traditional, linear grid-world problem, we use the grid in a radial coordinate system which surrounds the user and each grid square represent a pan/tilt angle coordinate. See Fig.~\ref{fig:environment} for an example grid. Since we do not consider the depth dimension yet, each grid square is equidistant from the user and agent. The agent translates between the squares as the user points the camera in different directions.
@@ -157,7 +157,7 @@ and the possible actions are
 \end{equation}
 %These actions were chosen to conform to the grid implementation and increase the tracking performance of $u^*$ w.r.t\@ $u$. 
 
-Consider the scene in Figure~\ref{fig:route-example} which contains a number of simple, distinct objects (the red boxes). The MDP's task is to direct the user to point the camera to the target object (the mug in the bottom-left of Figure~\ref{fig:route-example}). It does this by inferring the current state by sampling the object currently within the camera's view, and generates an action that leads the user to the target object. The states are sampled and the actions are generated in discretised steps as the user moves the camera's view in the instructed direction. This discrete behaviour is similar to a waypoint navigation approach where the user goes from one waypoint to the next, until the user points the camera to target object. 
+Consider the scene in Figure~\ref{fig:route-example} which contains a number of simple, distinct objects (the red boxes). The MDP's task is to direct the user to point the camera to the target object (the mug in the bottom-left of Figure~\ref{fig:route-example}). It does this by inferring the current state by sampling the object currently within the camera's view and generates an action that leads the user to the target object. The states are sampled and the actions are generated in discretised steps as the user moves the camera's view in the instructed direction. %This discrete behaviour is similar to a waypoint navigation approach where the user goes from one waypoint to the next, until the user points the camera to target object. 
 
 \begin{figure}
   \centering
@@ -270,7 +270,7 @@ By recording the previous positions and waypoint locations the app generated, it
 
 The QR code scanner requires raw image data. To avoid scanning multiple QR codes and using excess processing power by scanning large images, we only used the centre part of the screen to scan for a barcode. This scanner area is $300\times300$ pixels and scans for barcodes without causing any frame-rate drops.  
 
-The app was developed on and experimented with an Asus ZenPhone AR\footnote{asus.com/uk/Phone/ZenFone-AR-ZS571KL/} running Android version 7.0 with the ARCore SDK enabled. No hardware or software modifications were required.
+The app was developed on and experimented with an Asus ZenPhone AR\footnote{asus.com/uk/Phone/ZenFone-AR-ZS571KL/} running Android version 7.0 with the ARCore\footnote{https://developers.google.com/ar/} SDK enabled. No hardware or software modifications were required.
 
 \section{\uppercase{Experiments}}\label{sec:experiments}
 
