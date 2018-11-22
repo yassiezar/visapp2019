@@ -29,6 +29,13 @@
 
 \usepackage{SCITEPRESS}     % Please add other packages that you may need BEFORE the SCITEPRESS.sty package.
 
+
+
+\newcommand{\todo}[1]{\textcolor{red}{[#1]}}
+
+
+
+
 \begin{document}
 
 \title{Active Object Search with a Mobile Device for the Visually Impaired} 
@@ -43,21 +50,23 @@
 
 \keywords{Active vision, object search, vision impairment, Markov Decision Process}
 
-\abstract{Nowadays, smartphones can be used to provide a multitude of services to assist people with visual impairments. The cameras embedded in these mobile devices, in particular, can be used for many useful tasks, including searching particular objects in unknown environments. Although previous research in computer vision has looked at ways to solve these tasks by processing the video frames of the mobile camera, very little work has been done in {\em actively} guiding the user towards specific point of interest that maximise the effectiveness of the underlying visual algorithms.
+\abstract{Smartphones can be used to provide a multitude of services to assist people with visual impairments. The cameras embedded in these mobile devices, in particular, can be used for many useful tasks, including searching particular objects in unknown environments. Although previous research in computer vision has looked at ways to solve these tasks by processing the video frames of the mobile camera, very little work has been done in {\em actively} guiding the user towards specific point of interest that maximise the effectiveness of the underlying visual algorithms.
 In this paper, we propose a control algorithm based on a Markov Decision Process (MDP) that generates instructions, in real-time, to guide a user searching for a target object with a smartphone's camera. The solution is part of a more general active vision application for the visually impaired. An initial implementation of the system on an Android smartphone was experimentally evaluated with sighted participants to determine the performance of the control algorithm. The results show the effectiveness of our solution and its potential application to help the visually impaired find objects in unknown environments.}
 
 \onecolumn \maketitle \normalsize \vfill
 
 \section{\uppercase{Introduction}}
 
-\noindent It is estimated that there are 440 million people worldwide that live with mild to severe visual impairments or total blindness~\cite{bourne2017magnitude} and significant effort is being made to enable these people to lead more normal and independent lives. Modern improvements to mobile computing power and image processing techniques have provided researchers with new and powerful tools to solve this problem. The ActiVis project aims to contribute to this effort by delivering an indoor navigation system targeted towards enabling blind and visually impaired (VI) users to safely navigate towards their desired destination or find an object in an unknown and dynamic environment with minimal user input. The proposed system implements ideas from the field of active vision, but replaces the electro-mechanical servo used in a typical control loop, pictured in Figure~\ref{fig:control-loop}, with a human. %This project expands upon concepts originally proposed in~\cite{bellotto2013} and~\cite{lock2017portable}.
+\noindent It is estimated that almost half billion people worldwide live with mild to severe visual impairments or total blindness~\cite{bourne2017magnitude} and significant effort is being made to enable these people to lead more normal and independent lives. Modern improvements to mobile computing power and image processing techniques have provided researchers with new and powerful tools to solve this problem.
+%The ActiVis project aims to contribute to this effort by delivering an indoor navigation system targeted towards enabling blind and visually impaired (VI) users to safely navigate towards their desired destination or
+The work here presented is part of a project to assist the visually impaired (VI) navigate and find objects in unknown environments with the aid of a smartphone. The proposed system implements ideas from the field of active vision~\cite{Bajcsy2017}, but replaces the typical electro-mechanical actuators of the moving camera with the body (i.e. arm, hand) of the user holding the smartphone. Schematically, the actuators used in a typical control loop, pictured in Figure~\ref{fig:control-loop}, are replaced by a human. %This project expands upon concepts originally proposed in~\cite{bellotto2013} and~\cite{lock2017portable}.
 
 The goal of the ActiVis system is to understand the user's surroundings and determine what the next best course of action is to reach the target location based on what is currently within view and what has been observed in the past. We trained a Markov Decision Process (MDP)~\cite{bellman1957markovian} to produce a so-called policy that defines the optimal action the agent (the guidance system in this case) takes when it finds itself within some state.  
 
 \begin{figure}
   \centering
   \includegraphics[width=0.45\textwidth]{figures/control_loop.png}
-  \caption{The ActVis system layout and control loop. }\label{fig:control-loop}
+  \caption{The ActVis system layout and control loop. \todo{Explain the meanings of the symbols r, e, ... in the caption. Remove all direct references to ActiVis with more generic ``our project''.}}\label{fig:control-loop}
 \end{figure}
 
 This work's contributions are 
@@ -78,7 +87,7 @@ Section~\ref{sec:previous-work} discusses other relevant work done in this field
 
 Another approach is to discard tags completely and rely on computer vision to perform the object detection, something that has become more plausible with recent improvements to feature detectors and deep networks~\cite{huang2017speed,redmon2016you}. The system described~\cite{schauerte2012assistive} uses a combination of SIFT and SURF to detect known objects when they are in the camera's view and guide the user to them using sonified guidance instructions. This system is more flexible than the tag-based ones, but have the same drawback of being passive and rely on chance for the user to place the object within the camera's view in the first place. The paper also does not report on any performance metrics. In~\cite{bigham2010vizwiz}, the authors discuss their VizWiz system that offloads the object recognition tasks to an Amazon Mechanical Turk worker that then provides feedback on where the object of interest is located relative to the user. The VizWiz has the advantage of being fairly robust and is able to classify a great deal of objects with little effort from the user and can provide natural, human-generated and curated directions. However, this approach does not address the issue of enhancing user independence, since the user is now beholden to an online worker instead of a relative, friend or bystander. Furthermore, a good internet connection is required on the device, perhaps limiting use in some poor-reception areas.
 
-Researchers have begun implementing active search and perception~\cite{aloimonos2013active} strategies in robots and image classifiers in an attempt to optimise their classification and planning tasks by exploiting the structured nature of human object placements. 
+Researchers implemented active search and perception~\cite{Bajcsy2017} strategies in robots and image classifiers in an attempt to optimise their classification and planning tasks by exploiting the structured nature of human object placements. 
 
 In~\cite{caicedo2015active,gonzalez2015active}, the authors implemented an active search strategy for classifying objects within cluttered images. Their approaches use different methods, but both involve using a model to generate windows of interest to submit to a classifier for classification. The size and locations of the windows within the image are generated using the spatial relationship between objects, taken from the SUNCG and PASCAL datasets, and are iteratively changed based on the output from the respective models. The advantage of their approaches over their contemporaries is that far fewer windows are generated and submitted to the classifier, resulting in lower object classification times. They also report comparable accuracy when compared to their contemporaries. 
 
