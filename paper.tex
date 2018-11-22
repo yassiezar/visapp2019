@@ -53,7 +53,7 @@
 
 \section{\uppercase{Introduction}}
 
-\noindent It is estimated that almost half a billion people worldwide live with mild to severe visual impairments or total blindness~\cite{bourne2017magnitude} and significant effort is being made to enable these people to lead more normal and independent lives. Modern improvements in mobile computing power and image processing techniques have provided researchers with new and powerful tools to solve this problem. The work presented here is part of a project to assist the visually impaired (VI) navigate and find objects in unknown environments with the aid of a smartphone. The proposed system implements ideas from the field of active vision~\cite{Bajcsy2017}, but replaces the typical electro-mechanical actuators of a moving camera with the body (i.e.\ arm, hand) of the user holding the smartphone, as pictured in Figure~\ref{fig:system-use}. Schematically, the actuators used in a typical control loop, shown in Figure~\ref{fig:control-loop}, are replaced by a human. %This project expands upon concepts originally proposed in~\cite{bellotto2013} and~\cite{lock2017portable}.
+\noindent It is estimated that almost half a billion people worldwide live with mild to severe visual impairments or total blindness~\cite{bourne2017magnitude} and significant effort is being made to enable these people to lead more normal and independent lives. Modern improvements in mobile computing power and image processing techniques have provided researchers with new and powerful tools to solve this problem. The work presented here is part of a project to assist the visually impaired (VI) navigate and find objects in unknown environments with the aid of a smartphone. The proposed system implements ideas from the field of active vision~\cite{Bajcsy2017,bellotto2013}, but replaces the typical electro-mechanical actuators of a moving camera with the body (i.e.\ arm, hand) of the user holding the smartphone, as pictured in Fig.~\ref{fig:system-use}. Schematically, the actuators used in a typical control loop, shown in Fig.~\ref{fig:control-loop}, are replaced by a human. %This project expands upon concepts originally proposed in~\cite{bellotto2013} and~\cite{lock2017portable}.
 
 \begin{figure}
   \centering
@@ -77,7 +77,7 @@ This work includes three main contributions:
   \item a set of user experiments that prove the effectiveness of our active search implementation.
 \end{itemize}
 
-%is the design of a guidance system and MDP (the control-block, $K$, pictured in Figure~\ref{fig:control-loop}) that can drive a user to point a mobile device's camera towards a given point in space in and find a target object. We also present and discuss preliminary experimental results to show how effective the system is at finding a target. This guidance system will be implemented into the ActiVis project upon successful tests. 
+%is the design of a guidance system and MDP (the control-block, $K$, pictured in Fig.~\ref{fig:control-loop}) that can drive a user to point a mobile device's camera towards a given point in space in and find a target object. We also present and discuss preliminary experimental results to show how effective the system is at finding a target. This guidance system will be implemented into the ActiVis project upon successful tests. 
 
 Section~\ref{sec:previous-work} discusses other relevant work done in this field, followed by a general explanation of the active vision system for human guidance in Section~\ref{sec:system-design}, and a detailed explanation of the human-control module in Section~\ref{sec:controller-design}. The experimental results are presented in Section~\ref{sec:experiments}, after which we conclude the paper and discuss future work in Section~\ref{sec:conclusion}. 
 
@@ -87,9 +87,9 @@ Section~\ref{sec:previous-work} discusses other relevant work done in this field
 
 Another approach is to discard tags completely and rely on computer vision to perform the object detection, something that has become more practical with recent improvements to feature detectors and deep networks~\cite{huang2017speed,redmon2016you}. SIFT and SURF-based object detectors have also been used to detect known objects, when they are in the camera's view, and to guide the user to them using sonified instructions~\cite{schauerte2012assistive}. These type of systems is more flexible than the tag-based ones, but it has the same drawback of being {\em passive}, in the sense that it relies on having the object within the camera's view in the first place. Also, no clear performance metrics are reported in the previous paper. The VizWiz system~\cite{bigham2010vizwiz} offloads the object recognition tasks to an Amazon Mechanical Turk worker who then provides feedback on where the object of interest is located relative to the user. The VizWiz has the advantage of being fairly robust and is able to classify a great deal of objects with little effort from the user and can provide natural, human-generated and curated directions. However, this approach does not enhance user independence, since the VI person is now beholden to an online worker instead of a relative, friend or bystander. Furthermore, a good internet connection is required on the device, possibly limiting its use in some poor-reception areas.
 
-Many previous researchers have implemented active search and perception strategies in robots and image classifiers~\cite{Bajcsy2017} in an attempt to optimise their classification and planning tasks, for example by exploiting the structured nature of human environments and object placements. 
+Previous researchers have implemented active search and perception strategies in robots and image classifiers~\cite{Bajcsy2017} in an attempt to optimise their classification and planning tasks, for example by exploiting the structured nature of human environments and object placements. 
 %
-Two research teams have recently implemented an active object search strategy into their image classifiers~\cite{caicedo2015active,gonzalez2015active}. Their approaches use different methods but conceptually similar models to generate windows of interest for visual classification. The size and locations of the windows within the image are generated using the spatial relationship between objects, taken from the SUNCG and PASCAL datasets~\cite{song2016ssc,Everingham10}, and are iteratively changed based on the output from the respective models. The advantage of their approaches is that fewer windows are generated and submitted to the classifier, resulting in lower object classification times. The authors also report comparable accuracy compared to their counterparts. 
+Two research teams have recently implemented an active object search strategy into their image classifiers~\cite{caicedo2015active,gonzalez2015active}. Their approaches use different methods but conceptually similar models to generate windows of interest for visual classification. The size and locations of the windows within the image are generated using the spatial relationship between objects, taken from the SUNCG and PASCAL datasets~\cite{song2016ssc,Everingham10}, and are iteratively changed based on the output from the respective models. The advantage of their approaches is that fewer windows are generated and submitted to the classifier, resulting in lower object classification times, while still keeping state-of-the-art results for the accuracy. 
 
 Similar strategies have been incorporated on robotic platforms to improve autonomous object search, manipulation and localisation tasks. For example, some researchers have developed a planning algorithm for a robotic manipulator that performs an optimal object search in a cluttered environment~\cite{dogar2014object}. Another team implemented an MDP-based system generating an optimal object search strategy in a room over a belief state of object positions and configurations~\cite{aydemir2011search}. However, the authors trained their MDP using a custom object-placement and configuration scenario, so their results are sensitive to changes within this distribution. 
 
@@ -100,9 +100,11 @@ that guides the user towards an out-of-view target object. Our system exploits p
 
 \section{\uppercase{Active Vision System}}\label{sec:system-design}
 
-\noindent This project's goal is to deliver a stand-alone system that can guide a VI user to their destination with minimal user input or intervention. A complete system diagram is given is Figure~\ref{fig:control-loop}. The system design loop is similar to that of a classical control problem where a controller generates a control signal that drives a component towards some reference point. In this case, the reference signal, $r$, is the object the user wishes to find which is achieved by placing the target object within the camera's view. Therefore, the goal of the control block, $K$, is to generate guidance instructions, $u$ to drive the user along a search path towards the target object. Since we place a human in the control loop, we have an extra block, $H$, that interprets $u$ and executes a physical action, $u^*$, that manipulates the sensor, $P$, that makes a new object observation. The new observation is then fed back to the loop and the error signal, $e$, is updated accordingly.  
+\noindent The work presented in this paper is a fundamental step towards a more general project's goal to develop a stand-alone system that can guide a VI user to their destination with minimal user input or intervention. A complete system diagram is given is Fig.~\ref{fig:control-loop}. This closed-loop system is conceptually similar to other classical control problems, where the difference between desired and actual state of a process is used to generate a control signal that changes the process itself.
 
-This work focusses on implementing $K$ and there are 2 points of interest to implementing such a controller successfully. Firstly, $K$ must be environment-agnostic, meaning that it cannot be constrained to specific environment since objects are not necessarily placed in the same place in every environment. Secondly, the controller must be robust enough to handle a badly interpreted $u$ signal. The risk of that happening can be minimised by generating clear and simple signals to help ensure that $u^*$ closely tracks $u$. 
+In this case, the reference signal, $r$, is the object the user wishes to capture with the smartphone's camera. The goal of the control block, $K$, is to generate human interpretable instructions, $u$, to guide the user towards the target object. The process to be controlled involves a human, $H$, who interprets the instruction and executes a physical action, $u^*$, to actually manipulates the smartphone's camera, $P$. A new observation, $y$, with the latter is then fed back to the loop and the error signal, $e$, is updated accordingly.  
+
+Here we focus in particular on the implementation of the control module $K$. Two important points are considered in the design of the controller. Firstly, $K$ must be scenario-agnostic, meaning that objects could be placed in different places, unknown a priori. Secondly, the controller must be robust enough to handle incorrect interpretations by the human of the instructions $u$. This risk can be mitigated by the use of clear and simple instructions that help $u^*$ follow as close as possible $u$. The implementation of this controller is discussed in detailed next. 
 
 \section{\uppercase{Human-control Module}}\label{sec:controller-design}
 
@@ -152,7 +154,7 @@ and the possible actions are
 \end{equation}
 %These actions were chosen to conform to the grid implementation and increase the tracking performance of $u^*$ w.r.t\@ $u$. 
 
-Consider the scene in Figure~\ref{fig:route-example} which contains a number of simple, distinct objects (the red boxes). The MDP's task is to direct the user to point the camera to the target object (the mug in the bottom-left of Figure~\ref{fig:route-example}). It does this by inferring the current state by sampling the object currently within the camera's view and generates an action that leads the user to the target object. The states are sampled and the actions are generated in discretised steps as the user moves the camera's view in the instructed direction. %This discrete behaviour is similar to a waypoint navigation approach where the user goes from one waypoint to the next, until the user points the camera to target object. 
+Consider the scene in Fig.~\ref{fig:route-example} which contains a number of simple, distinct objects (the red boxes). The MDP's task is to direct the user to point the camera to the target object (the mug in the bottom-left of Fig.~\ref{fig:route-example}). It does this by inferring the current state by sampling the object currently within the camera's view and generates an action that leads the user to the target object. The states are sampled and the actions are generated in discretised steps as the user moves the camera's view in the instructed direction. %This discrete behaviour is similar to a waypoint navigation approach where the user goes from one waypoint to the next, until the user points the camera to target object. 
 
 \begin{figure}
   \centering
@@ -213,7 +215,7 @@ Currently there are 8 objects encoded into the system, including a `nothing' ins
   \end{aligned}
 \end{equation}
 
-The spatial relationships between the objects in $\mathbf{O}$ are extracted from the OpenImage dataset~\cite{openimages} that consists of 1.74M images containing 14.6M manually drawn and labelled bounding boxes around objects (see Figure~\ref{fig:openimage-example} for an example) and is primarily aimed toward object recognition researchers to benchmark their models. The bounding boxes and object labels are used to extract the spatial relationships between the different objects in $\mathbf{O}$. Since the camera perspectives and absolute distances between the objects in the images are not given, we can only extract the relationships in the basic action terms specified in $\mathbf{A}$, e.g.\ we can only say that object 1 is above object 2, but not how far above. Our simple action-space and grid environment somewhat compensates for the dataset's lack of complexity. 
+The spatial relationships between the objects in $\mathbf{O}$ are extracted from the OpenImage dataset~\cite{openimages} that consists of 1.74M images containing 14.6M manually drawn and labelled bounding boxes around objects (see Fig.~\ref{fig:openimage-example} for an example) and is primarily aimed toward object recognition researchers to benchmark their models. The bounding boxes and object labels are used to extract the spatial relationships between the different objects in $\mathbf{O}$. Since the camera perspectives and absolute distances between the objects in the images are not given, we can only extract the relationships in the basic action terms specified in $\mathbf{A}$, e.g.\ we can only say that object 1 is above object 2, but not how far above. Our simple action-space and grid environment somewhat compensates for the dataset's lack of complexity. 
 
 \begin{figure}
   \centering
@@ -228,7 +230,7 @@ The spatial relationships between the objects in $\mathbf{O}$ are extracted from
   \caption{Examples of images from the OpenImage dataset containing objects from $\mathit{O}$~\cite{openimages}. }\label{fig:openimage-example}
 \end{figure}
 
-Figure~\ref{fig:obj-relationships} shows the spatial relationship between a subset of $\mathbf{O}$ (desk, keyboard and mouse). For example, when the agent is in state $s=\langle{}o=mouse, n, v\rangle$ and searching for a keyboard, there is a strong probability that the target object is $LEFT$ of the mouse. The MDP model considers all of the objects' spatial relationships when generating the optimal policy.
+Fig.~\ref{fig:obj-relationships} shows the spatial relationship between a subset of $\mathbf{O}$ (desk, keyboard and mouse). For example, when the agent is in state $s=\langle{}o=mouse, n, v\rangle$ and searching for a keyboard, there is a strong probability that the target object is $LEFT$ of the mouse. The MDP model considers all of the objects' spatial relationships when generating the optimal policy.
 
 \begin{figure}
   \centering
@@ -251,7 +253,7 @@ Our MDP has a relatively small state-action space. Therefore, a solution can be 
 
 \subsubsection{Android Implementation}\label{sec:system-implementation}
 
-We incorporated the trained MDP model and policies into an Android app (see Figure~\ref{fig:system-screenshot} for a screenshot). This app is responsible for generating the guidance instructions and tracking the agent and sensor ($K$ and $P$ blocks in Figure~\ref{fig:control-loop}) throughout a search session. Tracking the agent's pose allows the app to infer the current state and look up the optimal action to take. 
+We incorporated the trained MDP model and policies into an Android app (see Fig.~\ref{fig:system-screenshot} for a screenshot). This app is responsible for generating the guidance instructions and tracking the agent and sensor ($K$ and $P$ blocks in Fig.~\ref{fig:control-loop}) throughout a search session. Tracking the agent's pose allows the app to infer the current state and look up the optimal action to take. 
 
 \begin{figure}
   \centering
@@ -273,7 +275,7 @@ The app was developed on and experimented with an Asus ZenPhone AR running Andro
 
 \subsection{Experiment Design}
 
-\noindent For the experiment, the MDP policies were integrated into an Android application that uses the camera to provide observation data and track the pose and viewing direction. We avoided adding unnecessary variability and complexity to the experiment by providing visual waypoints on screen which the participants were allowed to use. A generic environment mimicking a typical office desk layout was set up as the experiment environment and contains 7 different objects (i.e.\ encoded QR codes), one of which could be selected for each experiment run. See Figure~\ref{fig:env-picture} for a picture of the environment. 
+\noindent For the experiment, the MDP policies were integrated into an Android application that uses the camera to provide observation data and track the pose and viewing direction. We avoided adding unnecessary variability and complexity to the experiment by providing visual waypoints on screen which the participants were allowed to use. A generic environment mimicking a typical office desk layout was set up as the experiment environment and contains 7 different objects (i.e.\ encoded QR codes), one of which could be selected for each experiment run. See Fig.~\ref{fig:env-picture} for a picture of the environment. 
 
 \begin{figure}
   \centering
@@ -329,7 +331,7 @@ The participants were left to repeat this process until we recorded 10 searches 
 
 \subsubsection{Target Acquisition Rate}
 
-\noindent The TAR is a measure of how successful the system was at directing a participant to the target object within the 15-step limit we set and is simply calculated as a proportion of the number completed searches vs.\ the total number of searches. Please note, however, that this plot is dependant on the step-limit we selected and should not be taken as an absolute measure of performance, but is rather presented to provide context to the other results we present. Figure~\ref{fig:tar-steps} shows the TAR as a function of the step-limit and it shows that there is a gradual increase in the TAR as the step limit increases, but tapers off as the step-limit increases.
+\noindent The TAR is a measure of how successful the system was at directing a participant to the target object within the 15-step limit we set and is simply calculated as a proportion of the number completed searches vs.\ the total number of searches. Please note, however, that this plot is dependant on the step-limit we selected and should not be taken as an absolute measure of performance, but is rather presented to provide context to the other results we present. Fig.~\ref{fig:tar-steps} shows the TAR as a function of the step-limit and it shows that there is a gradual increase in the TAR as the step limit increases, but tapers off as the step-limit increases.
 
 \begin{figure}
   \centering
@@ -345,7 +347,7 @@ The participants were left to repeat this process until we recorded 10 searches 
 
 Table~\ref{tab:results-full} shows a fairly consistent spread for the TAR across the participants. The inter-participant spread ($\sigma=11\%$) is fairly significant, perhaps indicating that the user's search behaviour and strategy affects the target acquisition performance, but with an average TAR of $82\%$, it is clear that the system successfully finds the target object during the vast majority of searches. 
 
-Figure~\ref{fig:tar-objects} shows the TAR for each object in $\mathbf{O}$. There are variations the TAR for the different objects, with the smaller objects typically being the hardest to find. However, the differences are not extreme and indicate that all the objects in $\mathbf{O}$ are roughly equally hard to find. This is also displayed in the simulation's TAR in Table~\ref{tab:results-summary}, which could not achieve 100\% because of the difficulty the agent had in finding the objects on the fringes of the environment. 
+Fig.~\ref{fig:tar-objects} shows the TAR for each object in $\mathbf{O}$. There are variations the TAR for the different objects, with the smaller objects typically being the hardest to find. However, the differences are not extreme and indicate that all the objects in $\mathbf{O}$ are roughly equally hard to find. This is also displayed in the simulation's TAR in Table~\ref{tab:results-summary}, which could not achieve 100\% because of the difficulty the agent had in finding the objects on the fringes of the environment. 
 
 \begin{figure}
   \centering
@@ -357,7 +359,7 @@ Failure cases were typically caused by the system entering a no-recovery state w
 
 \subsubsection{Number of Steps to Target}
 
-\noindent The number of steps to the target indicates the number of waypoints the system generated for the participant during the guidance process and is a major indication of system performance, where less waypoints means faster target acquisition and better performance. Figure~\ref{fig:nsteps-participants} shows the cumulative distribution of the number of steps to the target for all the participants. 
+\noindent The number of steps to the target indicates the number of waypoints the system generated for the participant during the guidance process and is a major indication of system performance, where less waypoints means faster target acquisition and better performance. Fig.~\ref{fig:nsteps-participants} shows the cumulative distribution of the number of steps to the target for all the participants. 
 
 \begin{figure}
   \centering
@@ -367,7 +369,7 @@ Failure cases were typically caused by the system entering a no-recovery state w
 
 The number of waypoints each participant required is fairly evenly spread across all of the participants, with the majority of searches ending within 4 steps of initialisation or ending. The population mean and standard deviation is 6.8 and 5.1 waypoints respectively. This is a reasonable result, since most target objects were placed within approximately 4 grid squares away from the participants' initial looking directions. However, the relatively high standard deviation should be noted and can also be reduced by implementing the automatic recovery mode mentioned previously, and avoiding information-sparse areas.
 
-%As expected, the number of steps the simulation required on average to find the target object is less than the participants did during the experiments. The full set of results for the simulation is given by a frequency mapping of the coincidences between the simulation and experimental data in Figure~\ref{fig:sim-vs-experiment}.
+%As expected, the number of steps the simulation required on average to find the target object is less than the participants did during the experiments. The full set of results for the simulation is given by a frequency mapping of the coincidences between the simulation and experimental data in Fig.~\ref{fig:sim-vs-experiment}.
 
 %\begin{figure}
   %\centering
@@ -379,7 +381,7 @@ The number of waypoints each participant required is fairly evenly spread across
 
 \subsubsection{Time to Target}
 
-\noindent The distribution of the total time it took the participants to reach the target object is given in Figure~\ref{fig:time-participants}. We see that the distribution is heavily skewed to the bottom with a long tail. The mean and standard deviation of the data is 29.8s and 23s respectively. %, is far greater than for the number of waypoints they required. Indeed, there is not a strong relationship between the number of waypoints a participant required and the time they took to find the target, as showcased by participant $s7$'s wide mean waypoint count and spread in Figure~\ref{fig:nsteps-participants} and the small spread and close-to-average time to target in Figure~\ref{fig:time-participants}. Furthermore, the opposite can be observed in participant $s8$'s small spread and low mean waypoint count in Figure~\ref{fig:nsteps-participants} and high spread and high mean time to target in Figure~\ref{fig:time-participants}. 
+\noindent The distribution of the total time it took the participants to reach the target object is given in Fig.~\ref{fig:time-participants}. We see that the distribution is heavily skewed to the bottom with a long tail. The mean and standard deviation of the data is 29.8s and 23s respectively. %, is far greater than for the number of waypoints they required. Indeed, there is not a strong relationship between the number of waypoints a participant required and the time they took to find the target, as showcased by participant $s7$'s wide mean waypoint count and spread in Fig.~\ref{fig:nsteps-participants} and the small spread and close-to-average time to target in Fig.~\ref{fig:time-participants}. Furthermore, the opposite can be observed in participant $s8$'s small spread and low mean waypoint count in Fig.~\ref{fig:nsteps-participants} and high spread and high mean time to target in Fig.~\ref{fig:time-participants}. 
 
 \begin{figure}
   \centering
