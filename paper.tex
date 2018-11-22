@@ -100,7 +100,7 @@ that guides the user towards an out-of-view target object. Our system exploits p
 
 \section{\uppercase{Active Vision System}}\label{sec:system-design}
 
-\noindent The work presented in this paper is a fundamental step towards a more general project's goal to develop a stand-alone system that can guide a VI user to their destination with minimal user input or intervention. A complete system diagram is given is Figure~\ref{fig:control-loop}. This closed-loop system is conceptually similar to other classical control problems, where the difference between desired and actual state of a process is used to generate a control signal that changes the process itself.
+\noindent The work presented in this paper is a fundamental step towards an over-arching project's goal to develop a stand-alone system that can guide a VI user to their destination with minimal user input or intervention. A complete system diagram is given in Figure~\ref{fig:control-loop}. This closed-loop system is conceptually similar to other classical control problems, where the difference between the desired and actual state of a process is used to generate a control signal that changes the process itself.
 
 In this case, the reference signal, $r$, is the object the user wishes to capture with the smartphone's camera. The goal of the control block, $K$, is to generate human interpretable instructions, $u$, to guide the user towards the target object. The process to be controlled involves a human, $H$, who interprets the instruction and executes a physical action, $u^*$, to actually manipulate the smartphone's camera, $P$. A new observation, $y$, with the latter is then fed back to the loop and the error signal, $e$, is updated accordingly.  
 
