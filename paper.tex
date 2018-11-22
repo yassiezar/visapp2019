@@ -60,17 +60,14 @@ The work presented here is part of a project to assist the visually impaired (VI
 
 \begin{figure}
   \centering
-  \begin{subfigure}
-    \centering
-    \includegraphics[width=0.38\textwidth]{figures/system_use.png}
-    \caption{The system in use during an experiment. }\label{fig:system-use}
-  \end{subfigure}
-  \hspace{8mm}
-  \begin{subfigure}
-    \centering
-    \includegraphics[width=0.45\textwidth]{figures/control_loop.png}
-    \caption{The system layout and control loop. $r$ is the reference object, $e$ the error signal, $u$ and $u^*$ the original and interpreted control signals and $y$ is the current object observation. $K$, $H$ and $P$ are the control, human and sensor blocks respectively. }\label{fig:control-loop}
-  \end{subfigure}
+  \includegraphics[width=0.38\textwidth]{figures/system_use.png}
+  \caption{The system in use during an experiment. }\label{fig:system-use}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.45\textwidth]{figures/control_loop.png}
+  \caption{The system layout and control loop. $r$ is the reference object, $e$ the error signal, $u$ and $u^*$ the original and interpreted control signals and $y$ is the current object observation. $K$, $H$ and $P$ are the control, human and sensor blocks respectively. }\label{fig:control-loop}
 \end{figure}
 
 The goal of this system is to understand the user's surroundings and determine what the next best course of action is to reach the target location based on what is currently within view and what has been observed in the past. We trained a Markov Decision Process (MDP)~\cite{bellman1957markovian} to produce a so-called policy that defines the optimal action the agent (the guidance system in this case) takes when it finds itself within some state.  
@@ -390,9 +387,7 @@ The number of waypoints each participant required is fairly evenly spread across
   \caption{The cumulative distribution of the participants' time taken to find a target object. }\label{fig:time-participants}
 \end{figure}
 
-In comparison to the VizWiz system~\cite{bigham2010vizwiz} (mean 92s, standard deviation 37.7s), our results look very reasonable. However, these results may greatly change when we test the system with VI participants like they did in~\cite{bigham2010vizwiz}.
-
-\todo{COMPARE RESULTS FROM ROBOTS? APPROX 100s FOR PLANNING AND EXECUTION}
+In comparison to the VizWiz system~\cite{bigham2010vizwiz} (mean 92s, standard deviation 37.7s), our results look very reasonable. However, these results may greatly change when we test the system with VI participants.
 
 \section{\uppercase{Conclusions}}\label{sec:conclusion}
 
