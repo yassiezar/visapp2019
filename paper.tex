@@ -57,27 +57,25 @@ In this paper, we propose a control algorithm based on a Markov Decision Process
 
 \section{\uppercase{Introduction}}
 
-\noindent It is estimated that almost half billion people worldwide live with mild to severe visual impairments or total blindness~\cite{bourne2017magnitude} and significant effort is being made to enable these people to lead more normal and independent lives. Modern improvements to mobile computing power and image processing techniques have provided researchers with new and powerful tools to solve this problem.
+\noindent It is estimated that almost half a billion people worldwide live with mild to severe visual impairments or total blindness~\cite{bourne2017magnitude} and significant effort is being made to enable these people to lead more normal and independent lives. Modern improvements to mobile computing power and image processing techniques have provided researchers with new and powerful tools to solve this problem.
 %The ActiVis project aims to contribute to this effort by delivering an indoor navigation system targeted towards enabling blind and visually impaired (VI) users to safely navigate towards their desired destination or
-The work here presented is part of a project to assist the visually impaired (VI) navigate and find objects in unknown environments with the aid of a smartphone. The proposed system implements ideas from the field of active vision~\cite{Bajcsy2017}, but replaces the typical electro-mechanical actuators of the moving camera with the body (i.e. arm, hand) of the user holding the smartphone. Schematically, the actuators used in a typical control loop, pictured in Figure~\ref{fig:control-loop}, are replaced by a human. %This project expands upon concepts originally proposed in~\cite{bellotto2013} and~\cite{lock2017portable}.
-
-The goal of the ActiVis system is to understand the user's surroundings and determine what the next best course of action is to reach the target location based on what is currently within view and what has been observed in the past. We trained a Markov Decision Process (MDP)~\cite{bellman1957markovian} to produce a so-called policy that defines the optimal action the agent (the guidance system in this case) takes when it finds itself within some state.  
+The work presented here is part of a project to assist the visually impaired (VI) navigate and find objects in unknown environments with the aid of a smartphone. The proposed system implements ideas from the field of active vision~\cite{Bajcsy2017}, but replaces the typical electro-mechanical actuators of the moving camera with the body (i.e.\ arm, hand) of the user holding the smartphone, as pictured in Figure~\ref{fig:system-use}. Schematically, the actuators used in a typical control loop, pictured in Figure~\ref{fig:control-loop}, are replaced by a human. %This project expands upon concepts originally proposed in~\cite{bellotto2013} and~\cite{lock2017portable}.
 
 \begin{figure}
   \centering
   \begin{subfigure}
     \centering
     \includegraphics[width=0.38\textwidth]{figures/system_use.png}
-    \caption{The ActiVis system in use during an experiment. }\label{fig:system-use}
+    \caption{The system in use during an experiment. }\label{fig:system-use}
   \end{subfigure}
   \begin{subfigure}
     \centering
     \includegraphics[width=0.45\textwidth]{figures/control_loop.png}
-    \caption{The ActVis system layout and control loop. }\label{fig:control-loop}
+    \caption{The system layout and control loop. $r$ is the reference object, $e$ the error signal, $u$ and $u^*$ the original and interpreted control signals and $y$ is the current object observation. $K$, $H$ and $P$ are the control, human and sensor blocks respectively. }\label{fig:control-loop}
   \end{subfigure}
-  \includegraphics[width=0.45\textwidth]{figures/control_loop.png}
-  \caption{The ActVis system layout and control loop. \todo{Explain the meanings of the symbols r, e, ... in the caption. Remove all direct references to ActiVis with more generic ``our project''.}}\label{fig:control-loop}
 \end{figure}
+
+The goal of this system is to understand the user's surroundings and determine what the next best course of action is to reach the target location based on what is currently within view and what has been observed in the past. We trained a Markov Decision Process (MDP)~\cite{bellman1957markovian} to produce a so-called policy that defines the optimal action the agent (the guidance system in this case) takes when it finds itself within some state.  
 
 This work's contributions are 
 
@@ -89,7 +87,7 @@ This work's contributions are
 
 %is the design of a guidance system and MDP (the control-block, $K$, pictured in Figure~\ref{fig:control-loop}) that can drive a user to point a mobile device's camera towards a given point in space in and find a target object. We also present and discuss preliminary experimental results to show how effective the system is at finding a target. This guidance system will be implemented into the ActiVis project upon successful tests. 
 
-Section~\ref{sec:previous-work} discusses other relevant work done in this field, followed by a detailed discussion on the design of the ActiVis guidance system, human-control module and MDP\@ in Sections~\ref{sec:system-design} and~\ref{sec:controller-design}. Then we discuss the experiment and present its results in Section~\ref{sec:experiments}, after which we conclude the paper and discuss the project's next steps in Section~\ref{sec:conclusion}. 
+Section~\ref{sec:previous-work} discusses other relevant work done in this field, followed by a detailed discussion on the design of the guidance system, human-control module and MDP\@ in Sections~\ref{sec:system-design} and~\ref{sec:controller-design}. Then we discuss the experiment and present its results in Section~\ref{sec:experiments}, after which we conclude the paper and discuss the project's next steps in Section~\ref{sec:conclusion}. 
 
 \section{\uppercase{Previous Work}}\label{sec:previous-work}
 
@@ -107,7 +105,7 @@ In all, much research has been conducted on object recognition and guidance towa
 
 \section{\uppercase{Active Vision System}}\label{sec:system-design}
 
-\noindent The ActiVis project's goal is to deliver a stand-alone system that can guide a VI user to their destination with minimal user input or intervention. A complete system diagram is given is Figure~\ref{fig:control-loop}. The system design loop is similar to that of a classical control problem where a controller generates a control signal that drives a component towards some reference point. In this case, the reference signal, $r$, is the object the user wishes to find which is achieved by placing the target object within the camera's view. Therefore, the goal of the control block, $K$, is to generate guidance instructions, $u$ to drive the user along a search path towards the target object. Since we place a human in the control loop, we have an extra block, $H$, that interprets $u$ and executes a physical action, $u^*$, that manipulates the sensor, $P$, that makes a new object observation. The new observation is then fed back to the loop and the error signal, $e$, is updated accordingly.  
+\noindent This project's goal is to deliver a stand-alone system that can guide a VI user to their destination with minimal user input or intervention. A complete system diagram is given is Figure~\ref{fig:control-loop}. The system design loop is similar to that of a classical control problem where a controller generates a control signal that drives a component towards some reference point. In this case, the reference signal, $r$, is the object the user wishes to find which is achieved by placing the target object within the camera's view. Therefore, the goal of the control block, $K$, is to generate guidance instructions, $u$ to drive the user along a search path towards the target object. Since we place a human in the control loop, we have an extra block, $H$, that interprets $u$ and executes a physical action, $u^*$, that manipulates the sensor, $P$, that makes a new object observation. The new observation is then fed back to the loop and the error signal, $e$, is updated accordingly.  
 
 This work focusses on implementing $K$ and there are 2 points of interest to implementing such a controller successfully. Firstly, $K$ must be environment-agnostic, meaning that it cannot be constrained to specific environment since objects are not necessarily placed in the same place in every environment. Secondly, the controller must be robust enough to handle a badly interpreted $u$ signal. The risk of that happening can be minimised by generating clear and simple signals to help ensure that $u^*$ closely tracks $u$. 
 
