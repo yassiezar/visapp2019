@@ -65,6 +65,7 @@ The work presented here is part of a project to assist the visually impaired (VI
     \includegraphics[width=0.38\textwidth]{figures/system_use.png}
     \caption{The system in use during an experiment. }\label{fig:system-use}
   \end{subfigure}
+  \hspace{8mm}
   \begin{subfigure}
     \centering
     \includegraphics[width=0.45\textwidth]{figures/control_loop.png}
@@ -175,7 +176,7 @@ Consider the scene in Figure~\ref{fig:route-example} which contains a number of 
 \noindent The reward function, $R$, is the immediate reward that the agent receives after transitioning from state $s$ to state $s'$ and is given by 
 
 \begin{equation}
-  R = r(s, s').
+  R\in r(s, s').
 \end{equation} 
 
 The goal of the agent is to maximise the cumulative reward it receives and is a very important parameter for producing a good policy that will define the optimal action for the agent to execute for any given state. In order to encourage the agent to actively search for the target object, a set of negative rewards must be defined, along with a relatively large positive reward for successfully reaching the target object. These parameters must be finely balanced to ensure efficient object search behaviour from the agent.
@@ -215,7 +216,7 @@ Currently there are 8 objects encoded into the system, including a `nothing' ins
   \end{aligned}
 \end{equation}
 
-The spatial relationships between the objects in $\mathbf{O}$ are extracted from the OpenImage dataset\footnote{https://storage.googleapis.com/openimages/web/index.html}~\cite{openimages} that consists of 1.74M images containing 14.6M manually drawn and labelled bounding boxes around objects (see Figure~\ref{fig:openimage-example} for an example) and is primarily aimed toward object recognition researchers to benchmark their models. The bounding boxes and object labels are used to extract the spatial relationships between the different objects in $\mathbf{O}$. Since the camera perspectives and absolute distances between the objects in the images are not given, we can only extract the relationships in the basic action terms specified in $\mathbf{A}$, e.g.\ we can only say that object 1 is above object 2, but not how far above. Our simple action-space and grid environment somewhat compensates for the dataset's lack of complexity. 
+The spatial relationships between the objects in $\mathbf{O}$ are extracted from the OpenImage dataset~\cite{openimages} that consists of 1.74M images containing 14.6M manually drawn and labelled bounding boxes around objects (see Figure~\ref{fig:openimage-example} for an example) and is primarily aimed toward object recognition researchers to benchmark their models. The bounding boxes and object labels are used to extract the spatial relationships between the different objects in $\mathbf{O}$. Since the camera perspectives and absolute distances between the objects in the images are not given, we can only extract the relationships in the basic action terms specified in $\mathbf{A}$, e.g.\ we can only say that object 1 is above object 2, but not how far above. Our simple action-space and grid environment somewhat compensates for the dataset's lack of complexity. 
 
 \begin{figure}
   \centering
@@ -267,7 +268,7 @@ By recording the previous positions and waypoint locations the app generated, it
 
 The QR code scanner requires raw image data. To avoid scanning multiple QR codes and using excess processing power by scanning large images, we only used the centre part of the screen to scan for a barcode. This scanner area is $300\times300$ pixels and scans for barcodes without causing any frame-rate drops.  
 
-The app was developed on and experimented with an Asus ZenPhone AR\todo{No footers}\footnote{asus.com/uk/Phone/ZenFone-AR-ZS571KL/} running Android version 7.0 with the ARCore\footnote{https://developers.google.com/ar/} SDK enabled. No hardware or software modifications were required.
+The app was developed on and experimented with an Asus ZenPhone AR running Android version 7.0 with Google's augmented reality toolkit (ARCore) enabled for measurement and device tracking. No hardware or software modifications were required.
 
 \section{\uppercase{Experiments}}\label{sec:experiments}
 
@@ -295,7 +296,7 @@ The participants were left to repeat this process until we recorded 10 searches 
 
 \begin{table}
   \centering
-  \caption{A table containing the results for the TAR, number of steps and time to target means ($\mu$) and standard deviations ($\sigma$) for each participant. }\label{tab:results-full}
+  \caption{A table containing the results for the TAR, number of steps and time to target means and standard deviations for each participant. }\label{tab:results-full}
   \begin{tabular}{cccc}
     \toprule
     Participant & TAR [\%] & Num. Steps & Time [s] \\ \midrule
@@ -331,12 +332,12 @@ The participants were left to repeat this process until we recorded 10 searches 
 
 \subsubsection{Target Acquisition Rate}
 
-\noindent The TAR is a measure of how successful the system was at directing a participant to the target object within the 15-step limit we set and is simply calculated as a proportion of the number completed searches vs.\ the total number of searches. Please note, however, that this plot is dependant on the step-limit we selected and should not be taken as an absolute measure of performance, but is rather presented to provide context to the other results we present. Figure~\ref{fig:tar-steps} shows the TAR as a function of the step-limit and it shows that there is a gradual increase in the TAR as the step limit increases, but tapers off at higher step-limits. The angled tail at the 15-step limit is interesting to note, however. \todo{WHY}
+\noindent The TAR is a measure of how successful the system was at directing a participant to the target object within the 15-step limit we set and is simply calculated as a proportion of the number completed searches vs.\ the total number of searches. Please note, however, that this plot is dependant on the step-limit we selected and should not be taken as an absolute measure of performance, but is rather presented to provide context to the other results we present. Figure~\ref{fig:tar-steps} shows the TAR as a function of the step-limit and it shows that there is a gradual increase in the TAR as the step limit increases, but tapers off as the step-limit increases.
 
 \begin{figure}
   \centering
   \includegraphics[width=0.5\textwidth]{figures/cdf_tar_limit.png}
-  \caption{The distribution of the TAR as a function of the step limit for a search. }\label{fig:tar-steps}
+  \caption{The distribution of the TAR as a function of the step limit for a search. The `x' indicates the cases that exceeded the 15-step limit. }\label{fig:tar-steps}
 \end{figure}
 
 %\begin{figure}
@@ -367,15 +368,15 @@ Failure cases were typically caused by the system entering a no-recovery state w
   \caption{The cumulative distribution of the participants' number of steps taken to find a target object. }\label{fig:nsteps-participants}
 \end{figure}
 
-The number of waypoints each participant required is fairly evenly spread across all of the participants, with the majority of searches ending at $n < 4 \land n > 13$. The population mean and standard deviation is 6.8 and 5.1 waypoints respectively. This is a reasonable result, since most target objects were placed within approximately 4 grid squares away from the participants' initial looking directions. However, the relatively high standard deviation should be noted and can also be reduced by implementing the automatic recovery mode mentioned previously, and avoiding information-sparse areas.
+The number of waypoints each participant required is fairly evenly spread across all of the participants, with the majority of searches ending within 4 steps of initialisation or ending. The population mean and standard deviation is 6.8 and 5.1 waypoints respectively. This is a reasonable result, since most target objects were placed within approximately 4 grid squares away from the participants' initial looking directions. However, the relatively high standard deviation should be noted and can also be reduced by implementing the automatic recovery mode mentioned previously, and avoiding information-sparse areas.
 
-As expected, the number of steps the simulation required on average to find the target object is less than the participants did during the experiments. The full set of results for the simulation is given by a frequency mapping of the coincidences between the simulation and experimental data in Figure~\ref{fig:sim-vs-experiment}.
+%As expected, the number of steps the simulation required on average to find the target object is less than the participants did during the experiments. The full set of results for the simulation is given by a frequency mapping of the coincidences between the simulation and experimental data in Figure~\ref{fig:sim-vs-experiment}.
 
-\begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{figures/experiment_vs_simulation.png}
-  \caption{A summary of the experiment and simulation steps to target results. }\label{fig:sim-vs-experiment}
-\end{figure}
+%\begin{figure}
+  %\centering
+  %\includegraphics[width=0.5\textwidth]{figures/experiment_vs_simulation.png}
+  %\caption{A summary of the experiment and simulation steps to target results. }\label{fig:sim-vs-experiment}
+%\end{figure}
 
 % It is interesting to note that participants $s6$ and $s10$ also found their targets within these reasonable bounds when accounted for the targets that they found within the 16-step limit. This supports the argument from the previous results that their decreased TAR was partly caused by an abnormally high number of entries into a no-recovery state and further reinforces the need to implement an automatic recovery feature in the system before deployment. 
 
