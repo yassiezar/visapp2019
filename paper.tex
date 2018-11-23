@@ -38,9 +38,9 @@
 \title{Active Object Search with a Mobile Device for the Visually Impaired} 
 
 \author{
-  \authorname{Anon McAnon{\sup{1}}}
-  \affiliation{\sup{1}Anon University of Anon, Anonville, Anonistan}
-  \email{anon.anon@anon.com}
+  \authorname{~}%Anon McAnon{\sup{1}}}
+  \affiliation{~}%\sup{1}Anon University of Anon, Anonville, Anonistan}
+  \email{~}%anon.anon@anon.com}
 %\affiliation{\sup{1}Lincoln Centre for Autonomous Systems (L-CAS), University of Lincoln, Lincoln, UK}
 %\email{jlock@lincoln.ac.uk}
 }
@@ -102,7 +102,7 @@ that guides the user towards an out-of-view target object. Our system exploits p
 
 \noindent The work presented in this paper is a fundamental step towards a more general project's goal to develop a stand-alone system that can guide a VI user to their destination with minimal user input or intervention. A complete system diagram is given is Figure~\ref{fig:control-loop}. This closed-loop system is conceptually similar to other classical control problems, where the difference between desired and actual state of a process is used to generate a control signal that changes the process itself.
 
-In this case, the reference signal, $r$, is the object the user wishes to capture with the smartphone's camera. The goal of the control block, $K$, is to generate human interpretable instructions, $u$, to guide the user towards the target object. The process to be controlled involves a human, $H$, who interprets the instruction and executes a physical action, $u^*$, to actually manipulates the smartphone's camera, $P$. A new observation, $y$, with the latter is then fed back to the loop and the error signal, $e$, is updated accordingly.  
+In this case, the reference signal, $r$, is the object the user wishes to capture with the smartphone's camera. The goal of the control block, $K$, is to generate human interpretable instructions, $u$, to guide the user towards the target object. The process to be controlled involves a human, $H$, who interprets the instruction and executes a physical action, $u^*$, to actually manipulate the smartphone's camera, $P$. A new observation, $y$, with the latter is then fed back to the loop and the error signal, $e$, is updated accordingly.  
 
 Here we focus in particular on the implementation of the control module $K$. Two important points are considered in the design of the controller. Firstly, $K$ must be scenario-agnostic, meaning that objects could be placed in different places, unknown a priori. Secondly, the controller must be robust enough to handle incorrect interpretations by the human of the instructions $u$. This risk can be mitigated by the use of clear and simple instructions that help $u^*$ follow as close as possible $u$. The implementation of this controller is discussed in detailed next. 
 
@@ -186,11 +186,11 @@ The goal of the agent is to maximise its cumulative reward, therefore this is a 
 
 \subsection{MDP Implementation}
 
-This section describe the actual implementation details of the MDP for active object search, including training and software deployment on our smartphone device.
+This section describe the actual implementation details of the MDP for active object search, including initial training and software deployment on our smartphone device.
 
 \subsubsection{Training} \label{sec:training}
 
-\noindent A policy that defines the optimal action for an agent to take for any given state is generated through a training process that involves letting the agent explore the entire state-space and iteratively improve its decision function, i.e.\ policy, in order to reach the target state in a way that maximises its cumulative reward. This method, called Q-learning~\cite{Watkins1992}, does not require a model of the agent's environment during training. 
+\noindent A policy that defines the optimal action for an agent to take for any given state is generated through a training process that involves letting the agent explore the entire state-space and iteratively improve its decision function, i.e.\ policy, in order to reach the target state in a way that maximises its cumulative reward. This method, called Q-learning~\cite{Watkins1992}, does not require a model of the agent's environment during training, allowing the policy to be used in many different scenarios.
 
 Currently there are 7 objects encoded into the system, plus a `nothing' instance where nothing of note is observed. Our initial implementation considers a simple office desk scenario containing the following objects:
 
@@ -242,7 +242,7 @@ The reward function was hand-crafted and the parameters were empirically selecte
 
 We force the MDP to generate a maximum of 11 (inclusive) steps to the target, with 11 being the longest possible route on the action grid (more details about the grid are in Section~\ref{sec:system-implementation}). A search could take longer than 11 steps, but the MDP considers that the maximum, which is convenient for keeping a manageable state-space and a simple reward function. The MDP therefore has a total of 154 reachable states ($s_{total}=11\times7\times2$).
 
-The lack of absolute spatial information in the OpenImage dataset generates ambiguities, which makes it hard for the model to converge to a single, optimal solution. We therefore could not use the popular value iteration algorithm~\cite{bellman1957markovian} and opted for the state-action-reward-state-action (SARSA) algorithm~\cite{rummery1994line} instead. SARSA is an on-policy algorithm that allows us to control the level of exploration vs.\ exploitation that makes it easier to find a solution, although this is not guaranteed to be optimal. 
+The lack of absolute spatial information in the OpenImage dataset generates ambiguities, which makes it hard for the model to converge to a single, optimal solution. We therefore opted to use the more conservative state-action-reward-state-action (SARSA) algorithm~\cite{rummery1994line}. SARSA is an on-policy algorithm that allows us to control the level of exploration vs.\ exploitation that makes it easier to find a solution, although this is not guaranteed to be optimal. 
 
 The MDP is trained until it converges to the optimal policy, or for a total of approximately 17 million episodes. The parameter $\alpha$, which controls the exploration vs.\ exploitation behaviour during training, maximises the exploration when set to $1$ and the exploitation when $0$. We therefore set $\alpha$ to be a function of the training episodes, starting with a high exploration value and exponentially changing to exploitation as the training progresses: 
 
@@ -255,7 +255,7 @@ Our MDP has a relatively small state-action space. Therefore, a solution can be 
 
 \subsubsection{Android Implementation}\label{sec:system-implementation}
 
-We incorporated the trained MDP model and policies into an Android app (see Figure~\ref{fig:system-screenshot} for a screenshot). This app is responsible for generating the guidance instructions and tracking the agent and sensor ($K$ and $P$ blocks in Figure~\ref{fig:control-loop}) throughout a search session. Tracking the agent's pose allows the app to infer the current state and look up the optimal action to take. 
+We incorporated the trained MDP-based controller into an app (see Figure~\ref{fig:system-screenshot}) for an Asus ZenPhone AR smartphone, running Android 7.0, with the Google's augmented reality toolkit (ARCore), which provides the necessary 3D pose of the device. No further software or hardware modifications were required. This app is responsible for generating the guidance instructions and tracking the camera sensor ($K$ and $P$ blocks in Figure~\ref{fig:control-loop}) throughout a search session. Tracking the camera's pose allows the app to infer the current state and choose the optimal action to take next. 
 
 \begin{figure}
   \centering
@@ -263,13 +263,12 @@ We incorporated the trained MDP model and policies into an Android app (see Figu
   \caption{A screenshot of the guidance interface showing a waypoint (based on an 3D Android model), the object scanner area and the guidance instruction arrows. }\label{fig:system-screenshot}
 \end{figure}
 
-The app uses a 6$\times$6 discretised and wrapped radial grid to simplify the tracking and waypoint generation processes. In this setup, the policy action is interpreted by the app and a new search waypoint is generated in the centre of the cell specified by the action, e.g.\ an `$UP$' action will generate a waypoint one grid cell up from where the user is currently pointing the camera. The app's guidance system then uses the new waypoint's location to provide the user with guidance instructions. The grid is generated at the app's start-up and remains constant throughout the app's lifetime. The policy actions, and waypoints by extension, are given in relative to the user's current viewing pan/tilt position. The grid spans \SI{120}{\degree} in both the pan and tilt dimensions, giving a resolution of \SI{20}{\degree} per grid cell. 
+The app uses a 6$\times$6 discretised and wrapped radial grid to simplify the tracking and waypoint generation processes. A policy action is converted by the app into a new search waypoint centred on a cell of the radial grid, e.g.\ an `$UP$' action will generate a waypoint one grid cell above the current the camera's orientation. Note that this cell is not part of the MDP' state: this radial grid is only used to discretised the pan-tilt movements of the camera and to guarantee a minimum angular variations between subsequent actions. The app's guidance system then uses the new waypoint's location to provide the user with guidance instructions. The grid is generated at the app's start-up and remains constant throughout the app's lifetime. The policy actions, and waypoints by extension, are given in relative to the user's current viewing pan/tilt position. The grid spans \SI{120}{\degree} in both the pan and tilt dimensions, giving a resolution of \SI{20}{\degree} per grid cell. 
 
 By recording the previous positions and waypoint locations the app generated, it can infer the state values for $v$ and $n$. Furthermore, the camera provides the ID of the object in view, populating $o$ in the state. A real-time object detector was not used in this system to avoid unnecessary complexity and processing overhead and encoded QR codes and barcode scanner library were used to simulate object detection instead. 
 
 The QR code scanner requires raw image data. To avoid scanning multiple QR codes and using excess processing power by scanning large images, we only used the centre part of the screen to scan for a barcode. This scanner area is $300\times300$ pixels and scans for barcodes without causing any frame-rate drops.  
 
-The app was developed on and experimented with an Asus ZenPhone AR running Android version 7.0 with Google's augmented reality toolkit (ARCore) enabled for measurement and device tracking. No hardware or software modifications were required.
 
 \section{\uppercase{Experiments}}\label{sec:experiments}
 
