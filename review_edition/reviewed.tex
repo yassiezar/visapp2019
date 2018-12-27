@@ -16,6 +16,8 @@
 \usepackage{multicol}
 \usepackage{pslatex}
 \usepackage{apalike}
+\usepackage{balance}
+
 
 \subfigtopskip=0pt
 \subfigcapskip=0pt
@@ -33,7 +35,7 @@
 
 \begin{document}
 
-\title{Active Object Search with a Mobile Device for People with Visual Impairments} 
+\title{Active Object Search with a Mobile Device\\for People with Visual Impairments} 
 
 \author{
   \authorname{Jacobus C. Lock{\sup{1}}, Grzegorz Cielniak\sup{1}, Nicola Bellotto\sup{1}}
@@ -49,11 +51,11 @@
 
 \section{\uppercase{Introduction}}
 
-\noindent It is estimated that almost half a billion people worldwide live with mild to severe visual impairments or total blindness~\cite{bourne2017magnitude} and significant effort is being made to enable these people to lead more independent lives. Modern improvements in mobile computing power and image processing techniques have provided researchers with new and powerful tools to solve this problem. The work presented here is part of a project to assist people with vision impairments to navigate and find objects in unknown environments with the aid of a smartphone. The proposed system implements ideas from the field of active vision~\cite{Bajcsy2017,bellotto2013}, but replaces the typical electro-mechanical actuators of a moving camera with the body (i.e.\ arm, hand) of the user holding the smartphone, as pictured in Figure~\ref{fig:system-use}. This project expands upon concepts originally proposed in~\cite{bellotto2013} and~\cite{lock2017portable}.
+\noindent It is estimated that almost half a billion people worldwide live with mild to severe visual impairments or total blindness~\cite{bourne2017magnitude} and significant effort is being made to enable these people to lead more independent lives. Modern improvements in mobile computing power and image processing techniques have provided researchers with new and powerful tools to solve this problem. The work presented here is part of a project to assist people with vision impairments to navigate and find objects in unknown environments with the aid of a smartphone. The proposed system implements ideas from the field of active vision~\cite{Bajcsy2017}, but replaces the typical electro-mechanical actuators of a moving camera with the body (i.e.\ arm, hand) of the user holding the smartphone, as pictured in Figure~\ref{fig:system-use}, expanding upon concepts originally proposed in~\cite{bellotto2013} and~\cite{lock2017portable}.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.38\textwidth]{../figures/system_use.png}
+  \includegraphics[width=0.85\columnwidth]{../figures/system_use.png}
   \caption{The system in use during an experiment. }\label{fig:system-use}
 \end{figure}
 
@@ -73,13 +75,13 @@ Section~\ref{sec:previous-work} discusses other relevant work done in this field
 
 \section{\uppercase{Previous Work}}\label{sec:previous-work}
 
-\noindent Assistive vision and guidance for people living with vision impairments is a growing research area. In recent years, the increase in mobile processing power and computer vision improvements have led to research in the use of smartphone cameras to augment or enhance a user's vision and help them find objects or other points of interest. Earlier attempts at the problem involved placing special markers or barcodes around an environment, which the user then scans with a smartphone or similar mobile device~\cite{gude2013blind,iannizzotto2005badge3d,manduchi2012mobile}. This device then uses some feedback mode, e.g.\ Braille or sound, to guide the user towards the target. %The major drawbacks to this approach is the significant upfront effort required to augment entire areas with markers to a point where the system will be useful to a VI user. Furthermore, these passive systems rely on the user scanning the marker in the first place; something that can be made more complicated with markers degrading over time, changing ambient lighting, different viewing angles and marker occlusion. 
+\noindent Assistive technology for people living with vision impairments is a growing research area~\cite{Manduchi2012,khoo2016multimodal}. In recent years, the increase in mobile processing power and computer vision improvements have led to research in the use of smartphone cameras to augment or enhance a user's vision and help them find objects or other points of interest. Earlier attempts at the problem involved placing special markers or barcodes around an environment, which the user then scans with a smartphone or similar mobile device~\cite{gude2013blind,iannizzotto2005badge3d,manduchi2012mobile}. This device then uses some feedback mode, e.g.\ Braille or sound, to guide the user towards the target. %The major drawbacks to this approach is the significant upfront effort required to augment entire areas with markers to a point where the system will be useful to a VI user. Furthermore, these passive systems rely on the user scanning the marker in the first place; something that can be made more complicated with markers degrading over time, changing ambient lighting, different viewing angles and marker occlusion. 
 
 Another approach is to discard tags completely and rely on computer vision to perform the object detection, something that has become more practical with recent improvements to feature detectors and deep networks~\cite{huang2017speed,redmon2016you}. SIFT and SURF-based object detectors have also been used to detect known objects, when they are in the camera's view, and to guide the user to them using sonified instructions~\cite{schauerte2012assistive}. These type of systems is more flexible than the tag-based ones, but it has the same drawback of being {\em passive}, in the sense that it relies on having the object within the camera's view in the first place. Also, no clear performance metrics are reported in the previous paper. The VizWiz system~\cite{bigham2010vizwiz} offloads the object recognition tasks to an Amazon Mechanical Turk worker who then provides feedback on where the object of interest is located relative to the user. The VizWiz has the advantage of being fairly robust and is able to classify a great deal of objects with little effort from the user and can provide natural, human-generated and curated directions. However, this approach does not enhance user independence, since a person with vision impairments is now beholden to an online worker instead of a relative, friend or bystander. Furthermore, a good internet connection is required on the device, possibly limiting its use in some poor-reception areas.
 
 Previous researchers have implemented active search and perception strategies in robots and image classifiers~\cite{Bajcsy2017} in an attempt to optimise their classification and planning tasks, for example by exploiting the structured nature of human environments and object placements. 
 %
-Two research teams have recently implemented an active object search strategy into their image classifiers~\cite{caicedo2015active,gonzalez2015active}. Their approaches use different methods, but conceptually similar models to generate windows of interest for visual classification. The size and locations of the windows within the image are generated using the spatial relationship between objects, taken from the SUNCG and PASCAL datasets~\cite{song2016ssc,Everingham10}, and are iteratively changed based on the output from the respective models. The advantage of their approaches is that fewer windows are generated and submitted to the classifier, resulting in lower object classification times while still keeping state-of-the-art results for accuracy. 
+Two research teams have recently implemented an active object search strategy into their image classifiers~\cite{caicedo2015active,gonzalez2015active}. Their approaches use different methods but conceptually similar models to generate windows of interest for visual classification. The size and locations of the windows within the image are generated using the spatial relationship between objects, taken from the SUNCG and PASCAL datasets~\cite{song2016ssc,Everingham10}, and are iteratively changed based on the output from the respective models. The advantage of their approaches is that fewer windows are generated and submitted to the classifier, resulting in lower object classification times while still keeping state-of-the-art results for accuracy. 
 
 Similar strategies have been incorporated on robotic platforms to improve autonomous object search, manipulation and localisation tasks. For example, some researchers have developed a planning algorithm for a robotic manipulator that performs an optimal object search in a cluttered environment~\cite{dogar2014object}. Another team implemented an MDP generating an optimal object search strategy in a room over a belief state of object positions and configurations~\cite{aydemir2011search}. However, the authors trained their MDP using a custom object-placement and configuration scenario, so their results are sensitive to changes within this distribution. 
 
@@ -90,7 +92,7 @@ that guides the user towards an out-of-view target object. Our system exploits p
 
 \section{\uppercase{Active Vision System}}\label{sec:system-design}
 
-\noindent The work presented in this paper is a fundamental step towards a more general project's goal to develop a stand-alone system that can guide a user living with vision impairments to their destination with minimal user input or intervention. A complete system diagram is given is Figure~\ref{fig:control-loop}. This closed-loop system is conceptually similar to other classical control problems, where the difference between desired and actual state of a process is used to generate a control signal that changes the process itself.
+\noindent The work presented in this paper is a fundamental step towards a more general project's goal to develop a stand-alone system that can guide a person with vision impairments to his/her destination with minimal user input or intervention. A complete system diagram is given is Figure~\ref{fig:control-loop}. This closed-loop system is conceptually similar to other classical control problems, where the difference between desired and actual state of a process is used to generate a control signal that changes the process itself.
 
 \begin{figure}
   \centering
@@ -100,7 +102,7 @@ that guides the user towards an out-of-view target object. Our system exploits p
 
 In this case, the reference signal, $r$, is the object the user wishes to capture with the smartphone's camera. The goal of the control block, $K$, is to generate human interpretable instructions, $u$, to guide the user towards the target object. The process to be controlled involves a human, $H$, who interprets the instruction and executes a physical action, $u^*$, to actually manipulate the smartphone's camera, $P$. A new observation, $y$, with the camera is then fed back to the loop and the error signal, $e$, is updated accordingly.  
 
-Here we focus in particular on the implementation of the control module $K$. Two important points are considered in the design of the controller. Firstly, $K$ must be scenario-agnostic, meaning that objects could be placed in different places with unknown a priori. Secondly, the controller must be robust enough to handle incorrect interpretations by the human of the instructions $u$. Since each person interprets audio signals differently (modelled by the transformation block $H$), this is an important consideration. For example, one person might interpret and execute an `UP' instruction correctly (i.e. $u\approx u^*$), while another might interpret it correctly, but execute an incorrect action. This risk can be mitigated by the use of clear and simple instructions that helps $u$ track $u^*$ as closely as possible. The implementation of this controller is discussed in detail next. 
+Here we focus in particular on the implementation of the control module $K$. Two important points are considered in the design of the controller. Firstly, $K$ must be scenario-agnostic, meaning that objects could be placed in different places with unknown a~priori information. Secondly, since each person could interpret the instruction $u$ differently (i.e. different transformation block $H$), the controller must be robust enough to handle such incorrect interpretations. For example, one person might interpret and execute an `UP' instruction correctly (i.e. $u \backsimeq u^*$), while another might interpret it correctly, but execute the wrong action. This risk can be mitigated by the use of clear and simple instructions that helps $u^*$ be as close as possible to $u$. The implementation of this controller is discussed in detail next. 
 
 \section{\uppercase{Human-control Module}}\label{sec:controller-design}
 
@@ -125,7 +127,7 @@ Here we focus in particular on the implementation of the control module $K$. Two
 \begin{equation}
   (\mathbf{S}, \mathbf{A}, \mathbf{T}, \mathbf{R}, \gamma),
 \end{equation}
-where $\mathbf{S}$ is a set of possible agent' states, $\mathbf{A}$ is a set of possible actions the agent can take in any given state, $\mathbf{T}$ is a set of state transition probabilities from state $s$ to state $s'$, with ${s,s'~\in~\mathbf{S}}$, and $\mathbf{R}$ is the reward the agent receives for reaching state $s'$ after executing action $a \in \mathbf{A}$ in state $s$. The scalar $\gamma$ is a discount factor which prioritises immediate over long-term rewards and affects the model's convergence rate. Each of these elements are defined and discussed next.
+where $\mathbf{S}$ is a set of possible agent' states, $\mathbf{A}$ is a set of possible actions the agent can take in any given state, $\mathbf{T}$ is a set of state transition probabilities from state $s$ to state $s'$, with ${s,s'~\in~\mathbf{S}}$, and $\mathbf{R}$ is the reward the agent receives for reaching state $s'$ after executing action $a \in \mathbf{A}$ in state $s$. The scalar $\gamma$ is a discount factor that prioritises immediate over long-term rewards and which affects the model's convergence rate~\cite{Russell2009}. Each of these elements are defined and discussed next.
 
 \subsubsection{States}\label{sec:states}
 
@@ -138,7 +140,7 @@ where $o$ is the current object in viewed by the camera, $n$ is the number of st
 
 \subsubsection{Actions}
 
-The policy produced by an MDP define the action the agent will take when it finds itself in any given state. In this case, the action is the direction of the next waypoint relatively to the current device's pose. The possible actions are given by
+The policy produced by an MDP defines the action the agent will take when it finds itself in any given state. In this case, the action is the direction of the next waypoint relatively to the current device's pose. The possible actions are given by
 
 \begin{equation}
   \mathbf{A} = \{UP, DOWN, LEFT, RIGHT\}.
@@ -151,8 +153,8 @@ An action is considered completed, and therefore a new state reached, when the c
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{../figures/office_desk_example.png}
-  \caption{An example action policies generated by the MDP to guide the user in pointing the camera from a random starting object (e.g. monitor) to a target object (e.g. mug). }\label{fig:route-example}
+  \includegraphics[width=\columnwidth]{../figures/office_desk_example.png}
+  \caption{Example of action policies generated by the MDP to guide the user in pointing the camera from a random starting object (e.g. monitor) to a target object (e.g. mug). }\label{fig:route-example}
 \end{figure}
 
 \subsubsection{State Transition Probabilities}
@@ -174,17 +176,17 @@ These spatial relationships are learned from a dataset during an initial trainin
 %   R\in r(s, s').
 % \end{equation} 
 % 
-The goal of the agent is to maximise its cumulative reward and it is very important to fine-tune $\mathbf{R}$ correctly in order to produce an effective action policy. In order to encourage the agent to find the target object as fast as possible, a relatively large positive reward should be assigned for successfully reaching the goal state, and a negative one in any other case. These parameters must be finely balanced to ensure effective object search behaviour.
+The goal of the agent is to maximise its cumulative reward and it is very important to fine-tune $\mathbf{R}$ correctly for producing an effective action policy. In order to encourage the agent to find the target object as fast as possible, a relatively large positive reward should be assigned for successfully reaching the goal state, and a negative one in any other case. These parameters must be finely balanced to ensure effective object search behaviour.
 
 %The reward function is a very important parameter for training the agent to produce the most effective policy. We define a constant negative reward for every step the agent takes, and increase this negative reward if the agent exceeds the 12-step limit we defined in the model, as well as if it regenerates a waypoint in a previously searched location. The values we used were empirically chosen and are given in Table~\ref{tab:rewards}.
 
 %The goal of the agent is to maximise its cumulative reward over time and these numbers are chosen such that they actively motivate the agent to reach the target, while hastening the process by slightly punishing it for each step it takes and increasing the punishment every time it re-explores a state and the longer it takes to reach the target. 
 
-\subsection{MDP Implementation}
+\subsection{System Implementation}
 
 This section describe the actual implementation details of the MDP for active object search, including initial training and software deployment on our smartphone device.
 
-\subsubsection{Training} \label{sec:training}
+\subsubsection{MDP Training} \label{sec:training}
 
 \noindent A policy that defines the optimal action for an agent to take for any given state is generated through a training process that involves letting the agent explore the entire state-space and iteratively improve its decision function, i.e.\ policy, in order to reach the target state in a way that maximises its cumulative reward. This method, called Q-learning~\cite{Watkins1992}, does not require a model of the agent's environment during training, allowing the policy to be used in many different scenarios.
 
@@ -196,26 +198,27 @@ Currently there are 7 objects encoded into the system, plus a `nothing' instance
   \end{aligned}
 \end{equation}
 
-The spatial relationships between the objects in $\mathbf{O}$ are extracted from the OpenImage dataset~\cite{openimages}, which consists of 1.74M images containing 14.6M manually drawn and labelled bounding boxes around objects (see Figure~\ref{fig:openimage-example} for an example). The dataset is primarily aimed toward object recognition researchers to benchmark their models. In our case though, the bounding boxes and object labels are used to extract the spatial relationships between the different objects in $\mathbf{O}$. Since the camera perspectives and absolute distances between the objects in the images are not given, we can only extract the relationships in the basic action terms specified in $\mathbf{A}$, e.g. we can only say that object 1 is above object 2, but not how far above. Our relatively simple action-space is therefore suitable for the dataset's lack of information. 
+The spatial relationships between the objects in $\mathbf{O}$ are extracted from the OpenImage dataset~\cite{openimages}, which consists of 1.74M images containing 14.6M manually drawn and labelled bounding boxes around objects (see Figure~\ref{fig:openimage-example} for some examples). The dataset is primarily aimed toward object recognition researchers to benchmark their models. In our case though, the bounding boxes and object labels are used to extract the spatial relationships between the different objects in $\mathbf{O}$. Since the camera perspectives and absolute distances between the objects in the images are not given, we can only extract the relationships in the basic action terms specified in $\mathbf{A}$, e.g. we can only say that object 1 is above object 2, but not how far above. Our relatively simple action-space is therefore suitable for the limited dataset information. 
 
 \begin{figure}
   \centering
   \begin{subfigure}
     \centering
-    \includegraphics[width=0.4\textwidth]{../figures/desk_example.png}
+    \includegraphics[width=\columnwidth]{../figures/desk_example.png}
   \end{subfigure}
+  \vfill
   \begin{subfigure}
     \centering
-    \includegraphics[width=0.4\textwidth]{../figures/mug_example.png}
+    \includegraphics[width=\columnwidth]{../figures/mug_example.png}
   \end{subfigure}
-  \caption{Examples of images from the OpenImage dataset containing objects from $\mathit{O}$~\cite{openimages}. }\label{fig:openimage-example}
+  \caption{Examples of images from the OpenImage dataset containing objects from our set $\mathbf{O}$~\cite{openimages}. }\label{fig:openimage-example}
 \end{figure}
 
 Figure~\ref{fig:obj-relationships} shows the spatial relationship between a subset of $\mathbf{O}$ (desk, keyboard and mouse). For example, when the agent is in state ${s=\langle o=mouse, n, v \rangle}$ and is searching for the object $o_{target} = keyboard$, there is a strong probability that the target object is on the mouse's $LEFT$. The MDP of course will consider all of the objects' spatial relationships when generating the optimal policy.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{../figures/object_relationships.png}
+  \includegraphics[width=\columnwidth]{../figures/object_relationships.png}
   \caption{Examples of the spatial relationships between the desk, keyboard and mouse objects. Each square corresponds to the probability of executing an action (top square for $UP$, left square for $LEFT$, etc.)}\label{fig:obj-relationships}
 \end{figure}
 
@@ -236,40 +239,51 @@ The reward function was hand-crafted and the parameters were empirically selecte
   \end{tabular}
 \end{table}
 
-We force the MDP to generate a maximum of 11 (inclusive) steps to the target, with 11 being the longest possible route on the action grid (more details about the grid are in Section~\ref{sec:system-implementation}). A search could take longer than 11 steps, but the MDP considers that the maximum, which is convenient for keeping a manageable state-space and a simple reward function. The MDP therefore has a total of 154 reachable states ($s_{total}=11\times7\times2$).
+We force the MDP to generate a maximum of 11 (inclusive) steps to the target, with 11 being the longest possible route on the action grid (more details about the grid are in Section~\ref{sec:waypoints-generation}). A search could take longer than 11 steps, but the MDP considers that the maximum, which is convenient for keeping a manageable state-space and a simple reward function. The MDP therefore has a total of 154 reachable states ($s_{tot}=11\times7\times2$).
 
 The lack of absolute spatial information in the OpenImage dataset generates ambiguities, which makes it hard for the model to converge to a single, optimal solution. We therefore opted to use the more conservative state-action-reward-state-action (SARSA) algorithm~\cite{rummery1994line}. SARSA is an on-policy algorithm that allows us to control the level of exploration vs.\ exploitation that makes it easier to find a solution, although this is not guaranteed to be optimal. 
 
 The MDP is trained until it converges to the optimal policy, or for a total of approximately 17 million episodes. The parameter $\alpha$, which controls the exploration vs.\ exploitation behaviour during training, maximises the exploration when set to $1$ and the exploitation when $0$. We therefore set $\alpha$ to be a function of the training episodes, starting with a high exploration value and exponentially changing to exploitation as the training progresses: 
 
 \begin{equation}
-  \alpha = \exp\Big(\frac{-i}{10~s_{total}}\Big) - 0.001,
+  \alpha = \exp\Big(\frac{-i}{10~s_{tot}}\Big) - 0.001,
 \end{equation}
-where $i$ is the episode index.  $\gamma$ is set to 0.95 to prioritise long-term reward and guarantee convergence. 
+where $i$ is the episode index. The discount factor $\gamma$ is set to 0.95 to prioritise long-term rewards and guarantee convergence. 
 
-Our MDP has a relatively small state-action space. Therefore, a solution can be found in a reasonable amount of time. However, it should be noted that adjusting the angle interval, or adding more actions or objects, can easily lead to an intractable size of the state-space. 
+Our MDP has a relatively small state-action space. Therefore, a solution can be found within a reasonable amount of time. However, it should be noted that adjusting the angle interval, or adding more actions or objects, can easily lead to an intractable space size. 
 
-\subsubsection{Android Implementation}\label{sec:system-implementation}
+\subsubsection{Waypoints Generation}\label{sec:waypoints-generation}
 
-We incorporated the trained MDP-based controller into an app (see Figure~\ref{fig:system-screenshot}) for an Asus ZenPhone AR smartphone, running Android 7.0, with Google's augmented reality toolkit (ARCore), which provides the necessary 3D pose of the device. No further software or hardware modifications were required. This app is responsible for generating the guidance instructions and tracking the camera sensor ($K$ and $P$ blocks in Figure~\ref{fig:control-loop}) throughout a search session. Tracking the camera's pose allows the app to infer the current state and choose the optimal action to take next. 
+The system uses a 6$\times$6 discretised radial grid to simplify the tracking and waypoint generation processes. The grid spans \SI{120}{\degree} in both the pan and tilt dimensions, giving a resolution of \SI{20}{\degree} per grid cell. A policy action is converted by the system into a new search waypoint centred on a cell of the radial grid, e.g.\ an `$UP$' action will generate a waypoint one grid cell above the camera's current orientation. Note that this cell is not part of the MDP' state and the radial grid is only used to discretise the pan-tilt movements of the camera and to guarantee a minimum angular variation between subsequent actions.
+
+% The grid is generated at the system's start-up and remains constant throughout its lifetime.
+The system uses the waypoint's location to provide the user with guidance instructions (i.e. $u$ in Figure~\ref{fig:control-loop}). The policy actions, and waypoints by extension, are relative to the current camera's pan-tilt orientation. The grid is also wrapped so, if the location of a waypoint exceeds the \SI{120}{\degree} limit, the same waypoint is moved to the opposite side of the grid, effectively limiting the search space to a \SI{120}{\degree}$\times$\SI{120}{\degree} area. 
+
+\subsubsection{Smartphone Application}\label{sec:smartphone-application}
+
+We incorporated the trained system into an app (see Figure~\ref{fig:system-screenshot}) for an Asus ZenPhone AR smartphone, running Android 7.0, with Google's augmented reality toolkit (ARCore), which provides the necessary 3D pose of the device. No further software or hardware modifications were required. This app is responsible for generating the guidance instructions and tracking the camera sensor ($K$ and $P$ blocks in Figure~\ref{fig:control-loop}) throughout a search session. Tracking the camera's pose allows the app to infer the current state and choose the optimal action to take next. 
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.35\textwidth]{../figures/system_screenshot2.png}
-  \caption{A screenshot of the guidance interface showing an example of guidance instructions towards a waypoint and the QR-object scanner area.}\label{fig:system-screenshot}
+  \includegraphics[width=\columnwidth]{../figures/system_screenshot2.png}
+  \caption{A screenshot of the smartphone interface showing an example of guidance instruction (down-left in this case) towards a waypoint and the QR-object scanner area.}\label{fig:system-screenshot}
 \end{figure}
 
-The app uses a 6$\times$6 discretised and wrapped radial grid to simplify the tracking and waypoint generation processes. The grid spans \SI{120}{\degree} in both the pan and tilt dimensions, giving a resolution of \SI{20}{\degree} per grid cell. A policy action is converted by the app into a new search waypoint centred on a cell of the radial grid, e.g.\ an `$UP$' action will generate a waypoint one grid cell above the camera's current orientation. Note that this cell is not part of the MDP's state and the radial grid is only used to discretise the pan-tilt movements of the camera and to guarantee a minimum angular variation between subsequent actions. The grid is generated at the app's start-up and remains constant throughout its lifetime. The app then uses the new waypoint's location to provide the user with guidance instructions. The policy actions, and waypoints by extension, are given relative to the current camera's pan-tilt orientation. The grid is wrapped, so if a waypoint's location exceeds the \SI{120}{\degree} limit, the waypoint is generated at the opposite side of the grid instead, limiting the search space to a \SI{120}{\degree}$\times$\SI{120}{\degree} area. 
+The system determines the state values for $n$ (number of search steps so far) and $v$ (waypoint already visited or not) described in Section~\ref{sec:states}, by recording the previous positions and waypoint locations. The camera provides the ID of the object currently within view, which is assigned to the state variable $o$. In the current implementation, we did not use a real object detector, but we simulated it with 7 different QR codes, one for each unique object, and a camera-based QR code scanner from Android's machine learning API (MLKit). This simplification guarantees full observability of the state and let us focus on the performance of the MDP-based controller in the following experiments. 
+%
+% The QR scanner requires raw image data.
+Moreover, to speed up the image processing and avoid scanning multiple QR codes, we only used the central part of the camera's frame, which is $300\times300$ pixels. This choice also defines the precision required in pointing the camera towards the object (see Figure~\ref{fig:system-screenshot}).
 
-The position of the waypoint is given to the user by a set of guidance instructions (the arrows seen on-screen in Figure~\ref{fig:system-screenshot}) in terms of the actions defined in $\textbf{A}$. This might seem like an unnecessary extra step, but this system is designed for user with vision impairments who are limited to audio instructions, which makes it necessary to split the instructions up into separate channels that can be communicated more simply. This requirement becomes clear when one considers the bandwidth limitations of a person's audio channel compared to the visual one. To clarify, the arrows were used for debugging and experimentation and they will be translated into audio signals once the audio interface is implemented.
+In a real application for people with visual impairments, the position of the waypoint would be given to the user by a set of audio or vibrotactile instructions. However, since we are mainly interested in evaluating the control algorithm of our system and not the interface ($K$ and not $u$), our current prototype generates guidance instructions with four on-screen arrows (see Figure~\ref{fig:system-screenshot}).
+% This might seem like an unnecessary extra step, but this system is designed for user with vision impairments who are limited to audio instructions, which makes it necessary to split the instructions up into separate channels that can be communicated more simply.
+% This requirement becomes clear when one considers the bandwidth limitations of a person's audio channel compared to the visual one.
+Obviously, this visual interface is only used for debugging and experimental evaluation of the controller, and it will be replaced by an opportune audio interface, e.g.~\cite{bellotto2013}, at a second stage.
 
-By recording the previous positions and waypoint locations, the system can infer the state values for $n$ and $v$ described in Section~\ref{sec:states}. Furthermore, the camera provides the ID of the object currently within view, which is assigned to the state variable $o$. As explained in the next section, we did not use a real object detector in our experiments, but we simulated it with 7 different QR codes, one for each unique object, and a camera-based QR code scanner from Android's machine learning API (MLKit). 
-
-The QR scanner requires raw image data. To avoid scanning multiple QR codes and speed up the image processing, we only used the central part of the camera's frame, which is $300\times300$ pixels. This choice also defines the precision required in pointing the camera towards the object (see also Figure~\ref{fig:system-screenshot}).
 
 \section{\uppercase{Experiments}}\label{sec:experiments}
 
-\noindent To test the effectiveness of our MDP and its policies, we designed a set of experiments that determined how effective the system is at directing a participant to point the device's camera towards a target object. This section discusses the experiments and their results. 
+\noindent To test the effectiveness of our MDP and its policies, we designed a set of experiments that determined how effective the system is at directing a participant to point the device's camera towards a target object.
+% This section discusses the experiments and their results. 
 
 \subsection{Experiment Design}
 
@@ -277,7 +291,7 @@ The QR scanner requires raw image data. To avoid scanning multiple QR codes and 
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.45\textwidth]{../figures/test_env_picture.jpg}
+  \includegraphics[width=\columnwidth]{../figures/test_env_picture.jpg}
   \caption{A picture of the environment used for the experiments. Each QR code represents an object.}\label{fig:env-picture}
 \end{figure}
 
@@ -289,7 +303,7 @@ The participants were left to repeat this process until we recorded 10 searches 
 
 \subsection{Results}
 
-\noindent We identified 3 different measures to evaluate the system's performance: target acquisition rate (TAR), number of steps to the target and the total time it took to find a target object. We present and discuss the results for each of these parameters in the next sections. The results for each individual participant is presented in Table~\ref{tab:results-full} and Table~\ref{tab:results-summary} gives the results across all of the participants. To provide a baseline measure for the ideal case, we ran a number of simulations in an environment mimicking the experiment setup with user that perfectly executes the policy, i.e.\ $u=u^*$. The TAR and steps to target results for the simulation are included in Table~\ref{tab:results-summary}.
+\noindent We identified 3 different measures to evaluate the system's performance: target acquisition rate (TAR), number of steps to the target and the total time it took to find a target object. We present and discuss the results for each of these parameters in the next sections. The results for each individual participant is presented in Table~\ref{tab:results-full} and Table~\ref{tab:results-summary} gives the results across all of the participants. To provide a baseline measure for the ideal case, we ran a number of simulations in an environment mimicking the experiment setup with a user who perfectly executes the policy, i.e.\ $u=u^*$. The TAR and steps to target results for the simulation are included in Table~\ref{tab:results-summary}.
 
 \begin{table}
   \centering
@@ -391,9 +405,11 @@ In comparison to the VizWiz system~\cite{bigham2010vizwiz} (mean 92s, standard d
 
 \section{\uppercase{Conclusions}}\label{sec:conclusion}
 
-\noindent In this work we presented and tested an MDP-based system to guide a person with vision impairments towards a target object with no apriori knowledge of the environment. We implemented the system in an Android app that we tested with a small group of sighted people to determine its viability and effectiveness at guiding a user to manipulating a camera and finding a target object. We found that is works well when compared to alternative systems, with a respectable mean time of target acquisition of 32s. However, the system can be improved by refining the search strategy and implementing an automatic fail-state recovery system that will guide a user back to neutral position if a fail-state is entered (e.g.\ a blank section of wall). Furthermore, a different dataset, purpose-built for object spatial relations, will give the MDP a more accurate understanding of the world and an improved transition model.
+\noindent In this work we presented and tested an MDP-based system to guide a person with vision impairments towards a target object with no a~priori knowledge of the environment. We implemented the system in an Android app that we tested with a small group of sighted people to determine its viability and effectiveness at guiding a user to manipulating a camera and finding a target object. We found that is works well when compared to alternative systems, with a respectable mean time of target acquisition of 32s. However, the system can be improved by refining the search strategy and implementing an automatic fail-state recovery system that will guide a user back to neutral position if a fail-state is entered (e.g.\ a blank section of wall). Furthermore, a different dataset, purpose-built for object spatial relations, will give the MDP a more accurate understanding of the world and an improved transition model.
 
 The next steps to this project will involve using the data recorded here to improve and refine the MDP model that provides the guidance. The model can also be expanded to include more objects and actions. However, an important consideration and expansion to the problem is to change the MDP to an Partially Observable MDP (POMDP) model that will bring the model more in line with reality by acknowledging that the objects are not perfectly observable and humans do not perfectly follow guidance instructions. This adjustment may be very important when we replace the QR code scanner with an object recognition that are typically more prone to making classification errors. Finally, the model can be adapted to use on-line learning techniques in order to further refine its transition model as the guidance system is used.  
+
+\balance
 
 % \clearpage
 \bibliographystyle{apalike}
