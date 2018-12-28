@@ -282,7 +282,7 @@ Obviously, this visual interface is only used for debugging and experimental eva
 
 \section{\uppercase{Experiments}}\label{sec:experiments}
 
-\noindent To test the effectiveness of our MDP and its policies, we designed a set of experiments that determined how effective the system is at directing a participant to point the device's camera towards a target object.
+\noindent To evaluate our system, we designed a set of experiments that determined how effective the MDP and its policies are at guiding the user in an object search task with the smartphone's camera.
 % This section discusses the experiments and their results. 
 
 \subsection{Experiment Design}
@@ -307,7 +307,7 @@ The participants were left to repeat this process until we recorded 10 searches 
 
 \begin{table}
   \centering
-  \caption{A table containing the results for the TAR, number of steps and time to target means and standard deviations for each participant. }\label{tab:results-full}
+  \caption{Results for the TAR, number of steps and time to target means and standard deviations for each participant. }\label{tab:results-full}
   \begin{tabular}{cccc}
     \toprule
     Participant & TAR [\%] & Num. Steps & Time [s] \\ \midrule
@@ -327,7 +327,7 @@ The participants were left to repeat this process until we recorded 10 searches 
   \end{tabular}                    
 \end{table}                        
                                    
-\begin{table}                      
+\begin{table}[b]                      
   \centering                       
   \caption{The means and standard deviations for the entire participant population for the experiments and simulations.}\label{tab:results-summary}
   \begin{tabular}{ccc}
@@ -345,10 +345,10 @@ The participants were left to repeat this process until we recorded 10 searches 
 
 \noindent The TAR is a measure of how successful the system was at directing a participant to the target object within the 15-step limit we set and is simply calculated as a proportion of the number completed searches vs.\ the total number of searches. Please note, however, that this plot is dependant on the step-limit we selected and should not be taken as an absolute measure of performance, but is rather presented to provide context to the other results we present. Figure~\ref{fig:tar-steps} shows the TAR as a function of the step-limit and it shows that there is a gradual increase in the TAR as the step limit increases, but tapers off as the step-limit increases.
 
-\begin{figure}
+\begin{figure}[b]
   \centering
-  \includegraphics[width=0.5\textwidth]{../figures/cdf_tar_limit.png}
-  \caption{The distribution of the TAR as a function of the step limit for a search. The `x' indicates the cases that exceeded the 15-step limit. }\label{fig:tar-steps}
+  \includegraphics[height=5.9cm]{../figures/cdf_tar_limit.png}
+  \caption{TAR as a function of the step limit for a search. The `x' indicates the cases that exceeded the 15-step limit. }\label{fig:tar-steps}
 \end{figure}
 
 %\begin{figure}
@@ -363,7 +363,7 @@ Figure~\ref{fig:tar-objects} shows the TAR for each object in $\mathbf{O}$. Ther
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.45\textwidth]{../figures/tar_objects.png}
+  \includegraphics[width=\columnwidth]{../figures/tar_objects.png}
   \caption{The TAR for each of the objects within $\mathbf{O}$. }\label{fig:tar-objects}
 \end{figure}
 
@@ -373,9 +373,9 @@ Failure cases were typically caused by the system entering a no-recovery state w
 
 \noindent The number of steps to the target indicates the number of waypoints the system generated for the participant during the guidance process and is a major indication of system performance, where less waypoints means faster target acquisition and better performance. Figure~\ref{fig:nsteps-participants} shows the cumulative distribution of the number of steps to the target for all the participants. 
 
-\begin{figure}
+\begin{figure}[b]
   \centering
-  \includegraphics[width=0.5\textwidth]{../figures/cdf_total_steps.png}
+  \includegraphics[height=5.9cm]{../figures/cdf_total_steps.png}
   \caption{The cumulative distribution of the participants' number of steps taken to find a target object. }\label{fig:nsteps-participants}
 \end{figure}
 
@@ -397,11 +397,11 @@ The number of waypoints each participant required is fairly evenly spread across
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{../figures/cdf_total_time.png}
+  \includegraphics[width=\columnwidth]{../figures/cdf_total_time.png}
   \caption{The cumulative distribution of the participants' time taken to find a target object. }\label{fig:time-participants}
 \end{figure}
 
-In comparison to the VizWiz system~\cite{bigham2010vizwiz} (mean 92s, standard deviation 37.7s), our results look very reasonable. However, these results may greatly change when we test the system with participants with vision impairments.
+In comparison to the VizWiz system~\cite{bigham2010vizwiz} (mean 92s, standard deviation 37.7s), our results look very reasonable, although there might be significant variations in case of participants with vision impairments.
 
 \section{\uppercase{Conclusions}}\label{sec:conclusion}
 
